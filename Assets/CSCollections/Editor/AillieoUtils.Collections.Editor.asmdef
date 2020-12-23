@@ -1,0 +1,17 @@
+{
+    "name": "AillieoUtils.Collections.Editor",
+    "references": [
+        "GUID:a267d374a3f50354db3535d17079931d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
