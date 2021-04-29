@@ -1,24 +1,28 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class SlidingWindow<T> : IEnumerable<T>, IEnumerable, ICollection<T>, ICollection
+    public class LimitedQueue<T> : IEnumerable<T>, IEnumerable, ICollection<T>, ICollection
     {
+        public event Action<T> onPop;
+
         private readonly Queue<T> queue;
         private int size;
 
         private static readonly int defaultCapacity = 16;
 
-        public SlidingWindow(int size):
+        public LimitedQueue(int size):
             this(size, defaultCapacity)
         {
         }
 
-        public SlidingWindow(int size, int capacity)
+        public LimitedQueue(int size, int capacity)
         {
+            this.size = size;
             queue = new Queue<T>(capacity);
         }
 
@@ -44,9 +48,27 @@ namespace AillieoUtils.Collections
 
         private void Trim()
         {
+            List<Exception> exceptions = null;
             while (queue.Count > size)
             {
-                queue.Dequeue();
+                T obj = queue.Dequeue();
+                try
+                {
+                    onPop?.Invoke(obj);
+                }
+                catch(Exception e)
+                {
+                    if(exceptions == null)
+                    {
+                        exceptions = new List<Exception>();
+                    }
+                    exceptions.Add(e);
+                }
+            }
+
+            if(exceptions != null)
+            {
+                throw new AggregateException(exceptions);
             }
         }
 
@@ -56,10 +78,26 @@ namespace AillieoUtils.Collections
         {
             if (queue.Count >= size)
             {
-                queue.Dequeue();
+                T obj = queue.Dequeue();
+                queue.Enqueue(item);
+
+                onPop?.Invoke(obj);
+            }
+            else
+            {
+                queue.Enqueue(item);
+            }
+        }
+
+        public bool TryAdd(T item)
+        {
+            if (queue.Count >= size)
+            {
+                return false;
             }
 
             queue.Enqueue(item);
+            return true;
         }
 
         public float Sum(Func<T, float> selector)
