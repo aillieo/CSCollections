@@ -1,14 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AillieoUtils.Collections
 {
     public class UniquePriorityQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
     {
-        private readonly HashSet<T> set;
-        private readonly PriorityQueue<T> queue;
-
         private class EqualityComparer : IEqualityComparer<T>
         {
             private readonly IComparer<T> comparer;
@@ -33,54 +31,138 @@ namespace AillieoUtils.Collections
         }
 
         public UniquePriorityQueue()
-            : this(null, null)
-        { }
+            : this(defaultCapacity, null)
+        {
+        }
+
+        public UniquePriorityQueue(int capacity)
+            : this(capacity, null)
+        {
+        }
 
         public UniquePriorityQueue(IComparer<T> comparer)
-            : this(null, comparer)
+            : this(defaultCapacity, comparer)
         {
         }
 
-        public UniquePriorityQueue(IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
+        public UniquePriorityQueue(int capacity, IComparer<T> comparer)
         {
-            if (comparer == null)
-            {
-                queue = new PriorityQueue<T>();
-            }
-            else
-            {
-                queue = new PriorityQueue<T>(comparer);
-                if (equalityComparer == null)
-                {
-                    equalityComparer = new EqualityComparer(comparer);
-                }
-            }
+            this.comparer = (comparer == null) ? Comparer<T>.Default : comparer;
+            this.data = new List<T>(capacity);
 
-            if (equalityComparer == null)
-            {
-                set = new HashSet<T>();
-            }
-            else
-            {
-                set = new HashSet<T>(equalityComparer);
-            }
+            EqualityComparer equalityComparer = new EqualityComparer(this.comparer);
+            set = new Dictionary<T, int>(capacity, equalityComparer);
         }
 
-        public int Count => queue.Count;
+        private readonly IComparer<T> comparer;
+        private List<T> data;
+        private const int defaultCapacity = 16;
+        private Dictionary<T, int> set;
+
+        public int Count { get; private set; }
 
         public bool IsSynchronized => throw new NotImplementedException();
 
         public object SyncRoot => throw new NotImplementedException();
 
-        public void Clear()
+        public bool Enqueue(T item)
         {
-            set.Clear();
-            queue.Clear();
+            if (set.ContainsKey(item))
+            {
+                return false;
+            }
+
+            while (Count >= data.Count)
+            {
+                data.Add(default);
+            }
+
+            data[Count] = item;
+            set[item] = Count;
+            SiftUp(Count++);
+
+            return true;
         }
 
-        public bool Contains(T item)
+        public T Dequeue()
         {
-            return set.Contains(item);
+            T v = Peek();
+            set.Remove(v);
+
+            Count--;
+
+            T last = data[Count];
+            data[Count] = default;
+            if (Count > 0)
+            {
+                data[0] = last;
+                set[last] = 0;
+            }
+
+            if (Count > 0)
+            {
+                SiftDown(0);
+            }
+
+            return v;
+        }
+
+        public void Clear()
+        {
+            Count = 0;
+            set.Clear();
+        }
+
+        public T Peek()
+        {
+            if (Count > 0)
+            {
+                return data[0];
+            }
+
+            throw new Exception($"attempt to get Top from a empty {nameof(PriorityQueue<T>)}");
+        }
+
+        private void SiftUp(int n)
+        {
+            T v = data[n];
+            for (int n2 = n / 2;
+                n > 0 && comparer.Compare(v, data[n2]) > 0;
+                n = n2, n2 /= 2)
+            {
+                T v0 = data[n2];
+                data[n] = v0;
+                set[v0] = n;
+            }
+
+            data[n] = v;
+            set[v] = n;
+        }
+
+        private void SiftDown(int n)
+        {
+            T v = data[n];
+            for (int n2 = n * 2;
+                n2 < Count;
+                n = n2, n2 *= 2)
+            {
+                if (n2 + 1 < Count && comparer.Compare(data[n2 + 1], data[n2]) > 0)
+                {
+                    n2++;
+                }
+
+                if (comparer.Compare(v, data[n2]) >= 0)
+                {
+                    break;
+                }
+
+                T v0 = data[n2];
+                data[n] = v0;
+                set[v0] = n;
+            }
+
+            data[n] = v;
+            set[v] = n;
         }
 
         public void CopyTo(Array array, int index)
@@ -88,36 +170,44 @@ namespace AillieoUtils.Collections
             throw new NotImplementedException();
         }
 
-        public T Dequeue()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            T item = queue.Dequeue();
-            set.Remove(item);
-            return item;
-        }
-
-        public bool Enqueue(T item)
-        {
-            if (set.Add(item))
-            {
-                queue.Enqueue(item);
-                return true;
-            }
-            return false;
-        }
-
-        public T Peek()
-        {
-            return queue.Peek();
+            return GetEnumerator();
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return queue.GetEnumerator();
+            for (int i = 0; i < Count; ++i)
+            {
+                yield return data[i];
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public bool Remove(T item)
         {
-            return queue.GetEnumerator();
+            if (set.TryGetValue(item, out int index))
+            {
+                data[index] = default;
+                set.Remove(item);
+
+                for (int i = index; i < Count - 1; ++i)
+                {
+                    T v0 = data[i + 1];
+                    data[i] = v0;
+                    set[v0] = i;
+                }
+
+                this.Count--;
+
+                if (index > 0)
+                {
+                    SiftDown(index - 1);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }
