@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class LimitedQueue<T> : IEnumerable<T>, IEnumerable, ICollection<T>, ICollection
+    public class LimitedQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
     {
         public event Action<T> onPop;
 
@@ -110,11 +110,9 @@ namespace AillieoUtils.Collections
             return queue.Average(selector);
         }
 
-        public bool IsReadOnly => false;
+        public bool IsSynchronized => ((ICollection)queue).IsSynchronized;
 
-        public bool IsSynchronized => throw new NotImplementedException();
-
-        public object SyncRoot => throw new NotImplementedException();
+        public object SyncRoot => ((ICollection)queue).SyncRoot;
 
         public void Clear()
         {
@@ -128,12 +126,12 @@ namespace AillieoUtils.Collections
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new System.NotImplementedException();
+            queue.CopyTo(array, arrayIndex);
         }
 
         public void CopyTo(Array array, int index)
         {
-            throw new NotImplementedException();
+            ((ICollection)queue).CopyTo(array, index);
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -141,14 +139,9 @@ namespace AillieoUtils.Collections
             return queue.GetEnumerator();
         }
 
-        public bool Remove(T item)
-        {
-            return ((ICollection<T>)queue).Remove(item);
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            return GetEnumerator();
         }
     }
 }
