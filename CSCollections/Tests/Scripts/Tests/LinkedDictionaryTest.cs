@@ -1,20 +1,13 @@
-using UnityEngine.Assertions;
+using NUnit.Framework;
+using Assert = UnityEngine.Assertions.Assert;
 
 namespace AillieoUtils.Collections.Tests
 {
+    [Category(nameof(LinkedDictionaryTest))]
     public static class LinkedDictionaryTest
     {
-        public static void Test()
-        {
-            TestAdd();
-            TestUpdate();
-            TestContains();
-            TestRemove();
-            TestFirstKey();
-            TestLastKey();
-        }
-
-        private static void TestAdd()
+        [Test]
+        public static void TestAdd()
         {
             LinkedDictionary<int, int> linked = new LinkedDictionary<int, int>();
             linked.Add(1, 1);
@@ -27,7 +20,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.AreEqual(linked[2], 2);
         }
 
-        private static void TestUpdate()
+        [Test]
+        public static void TestUpdate()
         {
             LinkedDictionary<string, string> linked = new LinkedDictionary<string, string>();
             linked.Add("a", "a");
@@ -39,7 +33,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.AreEqual(linked["a"], "b");
         }
 
-        private static void TestContains()
+        [Test]
+        public static void TestContains()
         {
             LinkedDictionary<int, string> linked = new LinkedDictionary<int, string>();
             linked.Add(1, "a");
@@ -50,7 +45,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.IsFalse(linked.ContainsKey(2));
         }
 
-        private static void TestRemove()
+        [Test]
+        public static void TestRemove()
         {
             LinkedDictionary<string, int> linked = new LinkedDictionary<string, int>();
             linked.Add("a", 1);
@@ -75,7 +71,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.IsFalse(linked.ContainsKey("b"));
         }
 
-        private static void TestFirstKey()
+        [Test]
+        public static void TestFirstKey()
         {
             LinkedDictionary<int, char> linked = new LinkedDictionary<int, char>();
             linked.Add(1, 'a');
@@ -95,7 +92,8 @@ namespace AillieoUtils.Collections.Tests
             linked.Remove(4);
         }
 
-        private static void TestLastKey()
+        [Test]
+        public static void TestLastKey()
         {
             LinkedDictionary<int, bool> linked = new LinkedDictionary<int, bool>();
             linked.Add(1, false);

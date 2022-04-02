@@ -1,15 +1,21 @@
 {
     "name": "AillieoUtils.Collections.Tests",
     "references": [
-        "GUID:a267d374a3f50354db3535d17079931d"
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "AillieoUtils.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }
