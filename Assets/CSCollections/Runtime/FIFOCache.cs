@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,6 +7,29 @@ namespace AillieoUtils.Collections
     public class FIFOCache<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private readonly LinkedDictionary<TKey, TValue> linkedDictionary;
+        private static readonly int defaultCapacity = 255;
+        private int capacity;
+
+        public FIFOCache(int capacity)
+        {
+            this.capacity = capacity;
+            this.linkedDictionary = new LinkedDictionary<TKey, TValue>();
+        }
+
+        public FIFOCache()
+            : this(defaultCapacity)
+        {
+        }
+
+        public FIFOCache(int capacity, IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public FIFOCache(IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
 
         public ICollection<TKey> Keys => linkedDictionary.Keys;
 
@@ -17,43 +41,62 @@ namespace AillieoUtils.Collections
 
         public TValue this[TKey key]
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get
+            {
+                return linkedDictionary[key];
+            }
+
+            set
+            {
+                if (linkedDictionary.Remove(key))
+                {
+                    linkedDictionary.AddLast(key, value);
+                }
+                else
+                {
+                    if (linkedDictionary.Count + 1 > capacity)
+                    {
+                        linkedDictionary.Remove(linkedDictionary.FirstKey);
+                    }
+
+                    linkedDictionary.AddLast(key, value);
+                }
+            }
         }
 
         public void Add(TKey key, TValue value)
         {
-            throw new System.NotImplementedException();
+            linkedDictionary.AddLast(key, value);
         }
 
         public bool ContainsKey(TKey key)
         {
-            throw new System.NotImplementedException();
+            return linkedDictionary.ContainsKey(key);
         }
 
         public bool Remove(TKey key)
         {
-            throw new System.NotImplementedException();
+            return linkedDictionary.Remove(key);
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            throw new System.NotImplementedException();
+            return linkedDictionary.TryGetValue(key, out value);
         }
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            throw new System.NotImplementedException();
+            Add(item.Key, item.Value);
         }
 
         public void Clear()
         {
-            throw new System.NotImplementedException();
+            linkedDictionary.Clear();
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            throw new System.NotImplementedException();
+            return ((ICollection<KeyValuePair<TKey, TValue>>)linkedDictionary).Contains(item);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
@@ -68,12 +111,12 @@ namespace AillieoUtils.Collections
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            return linkedDictionary.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            return GetEnumerator();
         }
     }
 }

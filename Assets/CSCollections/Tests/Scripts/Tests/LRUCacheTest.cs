@@ -1,18 +1,13 @@
-using UnityEngine;
 using System;
-using UnityEngine.Assertions;
+using NUnit.Framework;
 
 namespace AillieoUtils.Collections.Tests
 {
+    [Category(nameof(LRUCacheTest))]
     public class LRUCacheTest
     {
-        public static void TestLRU()
-        {
-            TestGetValue();
-            TestReplace();
-        }
-
-        private static void TestGetValue()
+        [Test]
+        public static void TestGetValue()
         {
             var cache = new LRUCache<string, int>(3);
 
@@ -27,7 +22,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.AreEqual(cache["d"], 4, "should get 4");
         }
 
-        private static void TestReplace()
+        [Test]
+        public static void TestReplace()
         {
             var cache = new LRUCache<string, int>(3);
 

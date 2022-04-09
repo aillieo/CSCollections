@@ -193,7 +193,7 @@ public class Deque<T> : ICollection<T>, ICollection
     {
         if (Capacity != 0)
         {
-            return position % Capacity;
+            return (position + Capacity) % Capacity;
         }
 
         return 0;
@@ -201,7 +201,7 @@ public class Deque<T> : ICollection<T>, ICollection
 
     private int GetIndexInBuffer(int index)
     {
-        if (index < 0 || index >= Count)
+        if (index < 0 || index >= Capacity)
         {
             throw new ArgumentOutOfRangeException(nameof(index));
         }

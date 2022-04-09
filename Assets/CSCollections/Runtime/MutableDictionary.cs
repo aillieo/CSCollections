@@ -19,6 +19,21 @@ namespace AillieoUtils.Collections
             this.modifiedValues = new Dictionary<TKey, TValue>();
         }
 
+        public MutableDictionary(int capacity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public MutableDictionary(IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public MutableDictionary(int capacity, IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>) dictionary).IsReadOnly;
 
         public void Add(TKey key, TValue value)
@@ -319,11 +334,11 @@ namespace AillieoUtils.Collections
             private Dictionary<TKey, TValue>.Enumerator enumerator;
             private KeyValuePair<TKey, TValue> current;
 
-            internal Enumerator(MutableDictionary<TKey, TValue> removable)
+            internal Enumerator(MutableDictionary<TKey, TValue> mutable)
             {
-                this.mutable = removable;
-                this.enumerator = removable.dictionary.GetEnumerator();
-                removable.iterationLock++;
+                this.mutable = mutable;
+                this.enumerator = mutable.dictionary.GetEnumerator();
+                mutable.iterationLock++;
             }
 
             public bool MoveNext()

@@ -24,6 +24,16 @@ namespace AillieoUtils.Collections
             linkedDictionary = new LinkedDictionary<TKey, TValue>(capacity);
         }
 
+        public LRUCache(IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LRUCache(int capacity, IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
         public TValue this[TKey key]
         {
             get

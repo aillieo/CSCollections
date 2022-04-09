@@ -59,6 +59,21 @@ namespace AillieoUtils.Collections
             this.shrinkFactor = shrinkFactor;
         }
 
+        public LFUCache(IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LFUCache(int capacity, IEqualityComparer<TKey> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LFUCache(int capacity, IEqualityComparer<TKey> comparer, float shrinkFactor)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Add(TKey key, TValue value)
         {
             if (dictionary.ContainsKey(key))
@@ -101,7 +116,7 @@ namespace AillieoUtils.Collections
         {
             for (int i = 0; i <= maxFrequency; i++)
             {
-                if(dictByFrequency[i] != null)
+                if (dictByFrequency[i] != null)
                 {
                     dictByFrequency[i].Clear();
                 }
@@ -154,12 +169,12 @@ namespace AillieoUtils.Collections
 
         private LinkedDictionary<TKey, ValueWrapper> GetDictByFrequency(int frequency)
         {
-            if(frequency <0 || frequency > maxFrequency)
+            if (frequency < 0 || frequency > maxFrequency)
             {
                 throw new Exception();
             }
 
-            if(dictByFrequency[frequency] == null)
+            if (dictByFrequency[frequency] == null)
             {
                 dictByFrequency[frequency] = new LinkedDictionary<TKey, ValueWrapper>();
             }

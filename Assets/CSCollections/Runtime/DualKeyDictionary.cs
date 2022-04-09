@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,31 @@ namespace AillieoUtils.Collections
         public DualKeyDictionary()
         {
             dict = new Dictionary<KeyPack<TKey1, TKey2>, TValue>();
+        }
+
+        public DualKeyDictionary(int capacity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DualKeyDictionary(int capacity, IEqualityComparer<TKey1> key1Comparer, IEqualityComparer<TKey2> key2Comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DualKeyDictionary(int capacity, IEqualityComparer<KeyPack<TKey1, TKey2>> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DualKeyDictionary(IEqualityComparer<TKey1> key1Comparer, IEqualityComparer<TKey2> key2Comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DualKeyDictionary(IEqualityComparer<KeyPack<TKey1, TKey2>> comparer)
+        {
+            throw new NotImplementedException();
         }
 
         public TValue this[KeyPack<TKey1, TKey2> key]

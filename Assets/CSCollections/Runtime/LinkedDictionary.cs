@@ -66,9 +66,9 @@ namespace AillieoUtils.Collections
             }
         }
 
-        public ICollection<TKey> Keys => this.Select(pair => pair.Key).ToList().AsReadOnly();
+        public ICollection<TKey> Keys => this.Select(pair => pair.Key).ToArray();
 
-        public ICollection<TValue> Values => this.Select(pair => pair.Value).ToList().AsReadOnly();
+        public ICollection<TValue> Values => this.Select(pair => pair.Value).ToArray();
 
         public int Count => dict.Count;
 
@@ -251,7 +251,7 @@ namespace AillieoUtils.Collections
             return false;
         }
 
-        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             int v = version;
             if (dict.Count > 0)
@@ -268,7 +268,7 @@ namespace AillieoUtils.Collections
                     yield return new KeyValuePair<TKey, TValue>(key, wrapper.value);
                     key = wrapper.nextKey;
 
-                    if(dict.Comparer.Equals(key, firstKey))
+                    if (dict.Comparer.Equals(key, firstKey))
                     {
                         break;
                     }
@@ -278,7 +278,7 @@ namespace AillieoUtils.Collections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<KeyValuePair<TKey, TValue>>)this).GetEnumerator();
+            return GetEnumerator();
         }
 
         private void InternalAdd(TKey key, ValueWrapper wrapper)
