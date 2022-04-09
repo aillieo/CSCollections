@@ -113,7 +113,7 @@ namespace AillieoUtils.Collections
             }
 
             float weightSum = managedItems.Sum(item => item.weight);
-            float ran = rand.Next() * weightSum;
+            float ran = (float)rand.NextDouble() * weightSum;
             float sum = 0f;
             for (var j = 0; j < managedItems.Count; j++)
             {

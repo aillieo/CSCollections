@@ -1,21 +1,14 @@
-using UnityEngine;
 using System;
-using UnityEngine.Assertions;
-using AillieoUtils.Collections;
 using System.Linq;
+using NUnit.Framework;
 
 namespace AillieoUtils.Collections.Tests
 {
+    [Category(nameof(LFUCacheTest))]
     public class LFUCacheTest
     {
-        public static void TestLFU()
-        {
-            TestShrinkFactor();
-            TestGetValue();
-            TestReplace();
-        }
-
-        private static void TestShrinkFactor()
+        [Test]
+        public static void TestShrinkFactor()
         {
             foreach (int i in Enumerable.Range(160, 200))
             {
@@ -41,7 +34,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.AreEqual(cache1.Count, (int)(capacity * factor) + 1);
         }
 
-        private static void TestGetValue()
+        [Test]
+        public static void TestGetValue()
         {
             var cache = new LFUCache<string, int>(4, 0.5f);
 
@@ -56,7 +50,8 @@ namespace AillieoUtils.Collections.Tests
             Assert.AreEqual(cache["d"], 4, "should get 4");
         }
 
-        private static void TestReplace()
+        [Test]
+        public static void TestReplace()
         {
             var cache = new LFUCache<string, int>(4, 0.5f);
 

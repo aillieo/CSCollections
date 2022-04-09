@@ -15,7 +15,7 @@ namespace AillieoUtils.Collections
 
         private static readonly int defaultCapacity = 16;
 
-        public LimitedQueue(int size):
+        public LimitedQueue(int size) :
             this(size, defaultCapacity)
         {
         }
@@ -56,9 +56,9 @@ namespace AillieoUtils.Collections
                 {
                     onPop?.Invoke(obj);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    if(exceptions == null)
+                    if (exceptions == null)
                     {
                         exceptions = new List<Exception>();
                     }
@@ -66,7 +66,7 @@ namespace AillieoUtils.Collections
                 }
             }
 
-            if(exceptions != null)
+            if (exceptions != null)
             {
                 throw new AggregateException(exceptions);
             }

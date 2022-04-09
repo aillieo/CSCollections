@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Assert = UnityEngine.Assertions.Assert;
 
 namespace AillieoUtils.Collections.Tests
 {
