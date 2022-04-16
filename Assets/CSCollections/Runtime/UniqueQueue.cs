@@ -60,12 +60,12 @@ namespace AillieoUtils.Collections
             return false;
         }
 
-        public IEnumerator GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return queue.GetEnumerator();
+            return GetEnumerator();
         }
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             return queue.GetEnumerator();
         }

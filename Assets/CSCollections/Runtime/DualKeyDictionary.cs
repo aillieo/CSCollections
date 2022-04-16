@@ -132,7 +132,7 @@ namespace AillieoUtils.Collections
 
         public void CopyTo(KeyValuePair<KeyPack<TKey1, TKey2>, TValue>[] array, int arrayIndex)
         {
-            throw new System.NotImplementedException();
+            ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)dict).CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>> GetEnumerator()

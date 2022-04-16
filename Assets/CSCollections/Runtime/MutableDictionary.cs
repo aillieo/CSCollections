@@ -116,9 +116,9 @@ namespace AillieoUtils.Collections
                 {
                     throw new Exception("Copy while iterating");
                 }
-
-                ((ICollection<KeyValuePair<TKey, TValue>>) dictionary).CopyTo(array, arrayIndex);
             }
+
+            ((ICollection<KeyValuePair<TKey, TValue>>) dictionary).CopyTo(array, arrayIndex);
         }
 
         public int Count
