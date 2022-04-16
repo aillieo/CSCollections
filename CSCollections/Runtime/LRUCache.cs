@@ -120,7 +120,7 @@ namespace AillieoUtils.Collections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
 
         public int Count

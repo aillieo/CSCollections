@@ -217,7 +217,7 @@ namespace AillieoUtils.Collections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return dictionary.GetEnumerator();
+            return GetEnumerator();
         }
 
         private void InternalAddKeyForValue(TValue value, TKey key)
