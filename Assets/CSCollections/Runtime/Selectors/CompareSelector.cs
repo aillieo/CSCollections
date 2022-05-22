@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AillieoUtils.Collections
 {
-    public class CompareSelector<TSource, TTarget> : IComparer<TSource where TTarget : IComparable<TTarget>
+    public class CompareSelector<TSource, TTarget> : IComparer<TSource> where TTarget : IComparable<TTarget>
     {
         private readonly Func<TSource, TTarget> selector;
 
