@@ -65,7 +65,9 @@ namespace AillieoUtils.Collections
         }
 
         public int Count { get; }
-        public bool IsReadOnly { get; }
+
+        bool ICollection<T>.IsReadOnly => false;
+
         public int IndexOf(T item)
         {
             throw new NotImplementedException();

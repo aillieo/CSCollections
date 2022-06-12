@@ -12,9 +12,9 @@ namespace AillieoUtils.Collections
 
         public int Count { get; private set; }
 
-        public bool IsSynchronized => throw new NotImplementedException();
+        bool ICollection.IsSynchronized => false;
 
-        public object SyncRoot => throw new NotImplementedException();
+        object ICollection.SyncRoot => this;
 
         public PriorityQueue()
             : this(null) { }

@@ -43,7 +43,7 @@ namespace AillieoUtils.Collections
         }
 
         public int Count { get; }
-        public bool IsReadOnly { get; }
+        bool ICollection<KeyValuePair<TKey, ICollection<TValue>>>.IsReadOnly => false;
         public void Add(TKey key, ICollection<TValue> value)
         {
             throw new NotImplementedException();

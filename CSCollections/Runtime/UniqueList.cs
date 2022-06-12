@@ -26,13 +26,15 @@ namespace AillieoUtils.Collections
 
         public int Count => list.Count;
 
-        public bool IsSynchronized => throw new NotImplementedException();
+        bool ICollection.IsSynchronized => false;
 
-        public object SyncRoot => throw new NotImplementedException();
+        object ICollection.SyncRoot => this;
 
-        public bool IsReadOnly => throw new NotImplementedException();
+        bool ICollection<T>.IsReadOnly => false;
 
-        public bool IsFixedSize => throw new NotImplementedException();
+        bool IList.IsReadOnly => false;
+
+        bool IList.IsFixedSize => false;
 
         public void Add(T item)
         {

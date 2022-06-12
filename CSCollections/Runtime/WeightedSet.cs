@@ -7,7 +7,7 @@ namespace AillieoUtils.Collections
 {
     public class WeightedSet<T>
     {
-        private Random rand = new Random();
+        private Random rand;
 
         private class Entry
         {
@@ -21,7 +21,19 @@ namespace AillieoUtils.Collections
             }
         }
 
+        public bool logWhileTaking = false;
+
         private List<Entry> managedItems = new List<Entry>();
+
+        public WeightedSet()
+            : this(new Random())
+        {
+        }
+
+        public WeightedSet(Random rand)
+        {
+            this.rand = rand;
+        }
 
         public void Add(IEnumerable<KeyValuePair<T, float>> values)
         {
@@ -33,7 +45,7 @@ namespace AillieoUtils.Collections
 
         public void Add(T value, float weight = 1f)
         {
-            if (weight <= 0)
+            if (weight < 0)
             {
                 throw new Exception("invalid");
             }
@@ -65,6 +77,7 @@ namespace AillieoUtils.Collections
 
             for (var i = 0; i < count; i++)
             {
+                // todo weightSum 做dirty标记
                 float weightSum = deepcopy.Sum(item => item.weight);
                 float ran = rand.Next() * weightSum;
 
@@ -73,7 +86,10 @@ namespace AillieoUtils.Collections
                 {
                     sum += deepcopy[j].weight;
 
-                    //Debug.Log($"sum={sum} ran={ran}");
+                    if (logWhileTaking)
+                    {
+                        UnityEngine.Debug.Log($"index={j} sum={sum} ran={ran}");
+                    }
 
                     if (sum > ran)
                     {
@@ -118,6 +134,12 @@ namespace AillieoUtils.Collections
             for (var j = 0; j < managedItems.Count; j++)
             {
                 sum += managedItems[j].weight;
+
+                if (logWhileTaking)
+                {
+                    UnityEngine.Debug.Log($"index={j} sum={sum} ran={ran}");
+                }
+
                 if (sum > ran)
                 {
                     return managedItems[j].value;

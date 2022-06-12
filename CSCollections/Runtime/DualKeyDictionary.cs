@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public struct KeyPack<TKey1, TKey2>
+    public struct KeyPack<TKey1, TKey2> : IEquatable<KeyPack<TKey1, TKey2>>
     {
         public TKey1 key1;
         public TKey2 key2;
@@ -18,12 +18,23 @@ namespace AillieoUtils.Collections
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            if (obj is KeyPack<TKey1, TKey2> key)
+            {
+                return this.Equals(key);
+            }
+
+            return false;
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (EqualityComparer<TKey1>.Default.GetHashCode(key1) * 397) ^ EqualityComparer<TKey2>.Default.GetHashCode(key2);
+        }
+
+        public bool Equals(KeyPack<TKey1, TKey2> other)
+        {
+            return EqualityComparer<TKey1>.Default.Equals(key1, other.key1)
+                   && EqualityComparer<TKey2>.Default.Equals(key2, other.key2);
         }
     }
 
@@ -83,7 +94,7 @@ namespace AillieoUtils.Collections
 
         public int Count => dict.Count;
 
-        public bool IsReadOnly => ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)dict).IsReadOnly;
+        bool ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>.IsReadOnly => false;
 
         public void Add(KeyPack<TKey1, TKey2> key, TValue value)
         {

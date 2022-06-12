@@ -23,9 +23,9 @@ namespace AillieoUtils.Collections
 
         public int Count => queue.Count;
 
-        public bool IsSynchronized => throw new NotImplementedException();
+        bool ICollection.IsSynchronized => false;
 
-        public object SyncRoot => throw new NotImplementedException();
+        object ICollection.SyncRoot => this;
 
         public void Clear()
         {
