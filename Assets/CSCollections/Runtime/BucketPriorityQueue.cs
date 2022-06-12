@@ -1,9 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public class BucketPriorityQueue<TItem, TPriority> : IEnumerable<TItem>, IEnumerable, IReadOnlyCollection<TItem>, ICollection
     {
         private readonly PriorityQueue<TItem, TPriority>[] queues;
@@ -18,9 +18,9 @@ namespace AillieoUtils.Collections
 
         public int Count { get; private set; }
 
-        public bool IsSynchronized => throw new NotImplementedException();
+        bool ICollection.IsSynchronized => false;
 
-        public object SyncRoot => throw new NotImplementedException();
+        object ICollection.SyncRoot => this;
 
         public BucketPriorityQueue(int partitions, TPriority expectedPriorityMin, TPriority expectedPriorityMax)
         {

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class Deque<T> : ICollection<T>, ICollection
+    public class Deque<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
     {
         private static readonly int defaultCapacity = 8;
 
@@ -52,7 +52,7 @@ namespace AillieoUtils.Collections
 
         public T PopRight()
         {
-            if (IsEmpty)
+            if (Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
@@ -67,7 +67,7 @@ namespace AillieoUtils.Collections
 
         public T PopLeft()
         {
-            if (IsEmpty)
+            if (Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
@@ -83,7 +83,7 @@ namespace AillieoUtils.Collections
 
         public T PeekRight()
         {
-            if (IsEmpty)
+            if (Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
@@ -93,7 +93,7 @@ namespace AillieoUtils.Collections
 
         public T PeekLeft()
         {
-            if (IsEmpty)
+            if (Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
@@ -126,16 +126,6 @@ namespace AillieoUtils.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        void ICollection<T>.Add(T item)
-        {
-            PushRight(item);
-        }
-
-        bool ICollection<T>.Remove(T item)
-        {
-            throw new NotImplementedException();
         }
 
         public bool Contains(T item)
@@ -217,16 +207,6 @@ namespace AillieoUtils.Collections
 
         public int Count { get; private set; }
 
-        public bool IsEmpty
-        {
-            get { return Count == 0; }
-        }
-
-        bool ICollection<T>.IsReadOnly
-        {
-            get { return false; }
-        }
-
         public int Capacity
         {
             get
@@ -267,9 +247,9 @@ namespace AillieoUtils.Collections
             set { this[Count - 1] = value; }
         }
 
-        public bool IsSynchronized => throw new NotImplementedException();
+        bool ICollection.IsSynchronized => false;
 
-        public object SyncRoot => throw new NotImplementedException();
+        object ICollection.SyncRoot => this;
 
         public T this[int index]
         {

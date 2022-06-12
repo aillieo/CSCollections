@@ -4,8 +4,8 @@ using NUnit.Framework;
 
 namespace AillieoUtils.Collections.Tests
 {
-    [Category(nameof(PriorityQueueTest))]
-    public class PriorityQueueTest
+    [Category(nameof(PriorityQueueTest_1))]
+    public class PriorityQueueTest_1
     {
         [Test]
         public static void Test()

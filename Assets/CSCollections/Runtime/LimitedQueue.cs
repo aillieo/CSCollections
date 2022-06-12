@@ -110,9 +110,9 @@ namespace AillieoUtils.Collections
             return queue.Average(selector);
         }
 
-        public bool IsSynchronized => ((ICollection)queue).IsSynchronized;
+        bool ICollection.IsSynchronized => false;
 
-        public object SyncRoot => ((ICollection)queue).SyncRoot;
+        object ICollection.SyncRoot => this;
 
         public void Clear()
         {

@@ -34,7 +34,7 @@ namespace AillieoUtils.Collections
             throw new NotImplementedException();
         }
 
-        public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>) dictionary).IsReadOnly;
+        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
         public void Add(TKey key, TValue value)
         {

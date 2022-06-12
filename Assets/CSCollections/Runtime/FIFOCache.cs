@@ -37,7 +37,7 @@ namespace AillieoUtils.Collections
 
         public int Count => linkedDictionary.Count;
 
-        public bool IsReadOnly => false;
+        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
         public TValue this[TKey key]
         {
