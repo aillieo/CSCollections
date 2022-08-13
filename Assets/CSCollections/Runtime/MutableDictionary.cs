@@ -10,7 +10,7 @@ namespace AillieoUtils.Collections
         private readonly Dictionary<TKey, TValue> dictionary;
         private readonly HashSet<TKey> removedKeys;
         private readonly Dictionary<TKey, TValue> modifiedValues;
-        private int iterationLock = 0;
+        private int iterationLock;
 
         public MutableDictionary()
         {
@@ -362,7 +362,7 @@ namespace AillieoUtils.Collections
                                 mutable.modifiedValues[current.Key]);
                         }
 
-                        break;;
+                        break;
                     }
 
                     return true;

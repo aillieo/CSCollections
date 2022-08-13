@@ -1,12 +1,33 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class MultiDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ICollection<TValue>>>, IDictionary<TKey, ICollection<TValue>>
+    public class MultiDictionary<TKey, TValue> : IDictionary<TKey, ICollection<TValue>>
     {
+        private readonly Dictionary<TKey, IList<TValue>> dict;
+
+        public MultiDictionary()
+            : this(0, null)
+        {
+        }
+
+        public MultiDictionary(IEqualityComparer<TKey> comparer)
+            : this(0, comparer)
+        {
+        }
+
+        public MultiDictionary(int capacity)
+            : this(capacity, null)
+        {
+        }
+
+        public MultiDictionary(int capacity, IEqualityComparer<TKey> comparer)
+        {
+            dict = new Dictionary<TKey, IList<TValue>>(capacity, comparer);
+        }
+
         public IEnumerator<KeyValuePair<TKey, ICollection<TValue>>> GetEnumerator()
         {
             throw new NotImplementedException();
@@ -43,7 +64,9 @@ namespace AillieoUtils.Collections
         }
 
         public int Count { get; }
+
         bool ICollection<KeyValuePair<TKey, ICollection<TValue>>>.IsReadOnly => false;
+
         public void Add(TKey key, ICollection<TValue> value)
         {
             throw new NotImplementedException();
@@ -71,6 +94,7 @@ namespace AillieoUtils.Collections
         }
 
         public ICollection<TKey> Keys { get; }
+
         public ICollection<ICollection<TValue>> Values { get; }
     }
 }

@@ -1,12 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class LimitedQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
+    public class LimitedQueue<T> : IReadOnlyCollection<T>, ICollection
     {
         public event Action<T> onPop;
 

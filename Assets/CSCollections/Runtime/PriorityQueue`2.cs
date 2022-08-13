@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AillieoUtils.Collections
 {
-    public class PriorityQueue<TItem, TPriority> : IEnumerable<TItem>, IEnumerable, IReadOnlyCollection<TItem>, ICollection
+    public class PriorityQueue<TItem, TPriority> : IReadOnlyCollection<TItem>, ICollection
     {
         private struct Pair
         {

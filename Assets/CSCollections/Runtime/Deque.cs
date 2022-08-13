@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class Deque<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
+    public class Deque<T> : IReadOnlyCollection<T>, ICollection
     {
         private static readonly int defaultCapacity = 8;
 
@@ -202,7 +202,7 @@ namespace AillieoUtils.Collections
 
         public void CopyTo(Array array, int index)
         {
-            throw new NotImplementedException();
+            CopyTo(array as T[], index);
         }
 
         public int Count { get; private set; }

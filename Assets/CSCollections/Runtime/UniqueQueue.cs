@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AillieoUtils.Collections
 {
-    public class UniqueQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
+    public class UniqueQueue<T> : IReadOnlyCollection<T>, ICollection
     {
         private readonly HashSet<T> set;
         private readonly Queue<T> queue;

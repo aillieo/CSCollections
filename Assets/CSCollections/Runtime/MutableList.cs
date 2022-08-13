@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AillieoUtils.Collections
 {
@@ -10,7 +9,7 @@ namespace AillieoUtils.Collections
         private readonly List<T> list;
         private readonly HashSet<int> removedIndexes;
         private readonly Dictionary<int, T> modifiedValues;
-        private int iterationLock = 0;
+        private int iterationLock;
 
         public MutableList()
         {

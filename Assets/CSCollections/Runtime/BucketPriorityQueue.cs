@@ -4,7 +4,7 @@ namespace AillieoUtils.Collections
     using System.Collections;
     using System.Collections.Generic;
 
-    public class BucketPriorityQueue<TItem, TPriority> : IEnumerable<TItem>, IEnumerable, IReadOnlyCollection<TItem>, ICollection
+    public class BucketPriorityQueue<TItem, TPriority> : IReadOnlyCollection<TItem>, ICollection
     {
         private readonly PriorityQueue<TItem, TPriority>[] queues;
         private readonly TPriority priorityMin;
@@ -24,20 +24,22 @@ namespace AillieoUtils.Collections
 
         public BucketPriorityQueue(int partitions, TPriority expectedPriorityMin, TPriority expectedPriorityMax)
         {
+            throw new NotImplementedException();
         }
 
         public BucketPriorityQueue(int partitions, Func<TPriority, int> partitionFunc)
         {
+            throw new NotImplementedException();
         }
 
         public BucketPriorityQueue(int partitions, TPriority expectedPriorityMin, TPriority expectedPriorityMax, IComparer<TPriority> comparer)
         {
-
+            throw new NotImplementedException();
         }
 
         public BucketPriorityQueue(int partitions, Func<TPriority, int> partitionFunc, IComparer<TPriority> comparer)
         {
-
+            throw new NotImplementedException();
         }
 
         public void Enqueue(TItem item, TPriority priority)

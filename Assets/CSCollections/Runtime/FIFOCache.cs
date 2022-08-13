@@ -11,9 +11,8 @@ namespace AillieoUtils.Collections
         private int capacity;
 
         public FIFOCache(int capacity)
+            : this(capacity, null)
         {
-            this.capacity = capacity;
-            this.linkedDictionary = new LinkedDictionary<TKey, TValue>();
         }
 
         public FIFOCache()
@@ -23,12 +22,13 @@ namespace AillieoUtils.Collections
 
         public FIFOCache(int capacity, IEqualityComparer<TKey> comparer)
         {
-            throw new NotImplementedException();
+            this.capacity = capacity;
+            this.linkedDictionary = new LinkedDictionary<TKey, TValue>(capacity, null);
         }
 
         public FIFOCache(IEqualityComparer<TKey> comparer)
+            : this(defaultCapacity, comparer)
         {
-            throw new NotImplementedException();
         }
 
         public ICollection<TKey> Keys => linkedDictionary.Keys;
@@ -101,12 +101,12 @@ namespace AillieoUtils.Collections
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()

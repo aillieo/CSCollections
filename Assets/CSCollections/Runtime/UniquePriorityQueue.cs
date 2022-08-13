@@ -1,11 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class UniquePriorityQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
+    public class UniquePriorityQueue<T> : IReadOnlyCollection<T>, ICollection
     {
         private class EqualityComparer : IEqualityComparer<T>
         {

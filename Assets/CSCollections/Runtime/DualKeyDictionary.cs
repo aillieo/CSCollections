@@ -7,8 +7,8 @@ namespace AillieoUtils.Collections
 {
     public struct KeyPack<TKey1, TKey2> : IEquatable<KeyPack<TKey1, TKey2>>
     {
-        public TKey1 key1;
-        public TKey2 key2;
+        public readonly TKey1 key1;
+        public readonly TKey2 key2;
 
         public KeyPack(TKey1 key1, TKey2 key2)
         {
@@ -28,7 +28,7 @@ namespace AillieoUtils.Collections
 
         public override int GetHashCode()
         {
-            return (EqualityComparer<TKey1>.Default.GetHashCode(key1) * 397) ^ EqualityComparer<TKey2>.Default.GetHashCode(key2);
+            return key1.GetHashCode() * 397 ^ key2.GetHashCode();
         }
 
         public bool Equals(KeyPack<TKey1, TKey2> other)
@@ -38,38 +38,60 @@ namespace AillieoUtils.Collections
         }
     }
 
-    public class DualKeyDictionary<TKey1, TKey2, TValue> : IEnumerable<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>, IDictionary<KeyPack<TKey1, TKey2>, TValue>
+    public class DualKeyDictionary<TKey1, TKey2, TValue> : IDictionary<KeyPack<TKey1, TKey2>, TValue>
     {
-        private Dictionary<KeyPack<TKey1, TKey2>, TValue> dict;
+        public class EqualityComparer : IEqualityComparer<KeyPack<TKey1, TKey2>>
+        {
+            private readonly IEqualityComparer<TKey1> equalityComparer1;
+            private readonly IEqualityComparer<TKey2> equalityComparer2;
+
+            public EqualityComparer(IEqualityComparer<TKey1> equalityComparer1, IEqualityComparer<TKey2> equalityComparer2)
+            {
+                this.equalityComparer1 = equalityComparer1;
+                this.equalityComparer2 = equalityComparer2;
+            }
+
+            public bool Equals(KeyPack<TKey1, TKey2> x, KeyPack<TKey1, TKey2> y)
+            {
+                return this.equalityComparer1.Equals(x.key1, y.key1) && this.equalityComparer2.Equals(x.key2, y.key2);
+            }
+
+            public int GetHashCode(KeyPack<TKey1, TKey2> obj)
+            {
+                return (equalityComparer1.GetHashCode(obj.key1) * 397) ^ equalityComparer2.GetHashCode(obj.key2);
+            }
+        }
+
+        private readonly Dictionary<KeyPack<TKey1, TKey2>, TValue> dict;
 
         public DualKeyDictionary()
+        : this(0)
         {
-            dict = new Dictionary<KeyPack<TKey1, TKey2>, TValue>();
         }
 
         public DualKeyDictionary(int capacity)
+            : this(capacity, null)
         {
-            throw new NotImplementedException();
         }
 
         public DualKeyDictionary(int capacity, IEqualityComparer<TKey1> key1Comparer, IEqualityComparer<TKey2> key2Comparer)
+            : this(capacity, new EqualityComparer(key1Comparer, key2Comparer))
         {
-            throw new NotImplementedException();
         }
 
         public DualKeyDictionary(int capacity, IEqualityComparer<KeyPack<TKey1, TKey2>> comparer)
         {
-            throw new NotImplementedException();
+            dict = new Dictionary<KeyPack<TKey1, TKey2>, TValue>(capacity, comparer);
         }
 
         public DualKeyDictionary(IEqualityComparer<TKey1> key1Comparer, IEqualityComparer<TKey2> key2Comparer)
+            : this(0, new EqualityComparer(key1Comparer, key2Comparer))
         {
-            throw new NotImplementedException();
         }
 
         public DualKeyDictionary(IEqualityComparer<KeyPack<TKey1, TKey2>> comparer)
+            : this(0, comparer)
         {
-            throw new NotImplementedException();
         }
 
         public TValue this[KeyPack<TKey1, TKey2> key]
