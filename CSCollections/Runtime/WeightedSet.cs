@@ -5,25 +5,19 @@ using System.Linq;
 
 namespace AillieoUtils.Collections
 {
-    public class WeightedSet<T>
+    public class WeightedSet<T> : ICollection<T>
     {
         private Random rand;
 
-        private class Entry
-        {
-            public float weight;
-            public T value;
-
-            public Entry(T value, float weight = 1)
-            {
-                this.weight = weight;
-                this.value = value;
-            }
-        }
-
         public bool logWhileTaking = false;
 
-        private List<Entry> managedItems = new List<Entry>();
+        private float cachedWeightSum = -1f;
+
+        private Dictionary<T, float> managedItems = new Dictionary<T, float>();
+
+        public int Count => managedItems.Count;
+
+        public bool IsReadOnly => false;
 
         public WeightedSet()
             : this(new Random())
@@ -35,22 +29,30 @@ namespace AillieoUtils.Collections
             this.rand = rand;
         }
 
-        public void Add(IEnumerable<KeyValuePair<T, float>> values)
+        public void AddOrUpdate(IDictionary<T, float> items)
         {
-            foreach (var pair in values)
+            foreach (var pair in items)
             {
-                Add(pair.Key, pair.Value);
+                managedItems[pair.Key] = pair.Value;
             }
+
+            cachedWeightSum = -1f;
         }
 
-        public void Add(T value, float weight = 1f)
+        public void Add(T item, float weight)
         {
-            if (weight < 0)
-            {
-                throw new Exception("invalid");
-            }
+            weight = Math.Max(weight, 0);
+            managedItems.Add(item, weight);
 
-            managedItems.Add(new Entry(value, weight));
+            cachedWeightSum = -1f;
+        }
+
+        public void Update(T item, float weight)
+        {
+            weight = Math.Max(weight, 0);
+            managedItems[item] = weight;
+
+            cachedWeightSum = -1f;
         }
 
         public void Clear()
@@ -58,9 +60,9 @@ namespace AillieoUtils.Collections
             managedItems.Clear();
         }
 
-        public int Remove(T value)
+        public bool Remove(T item)
         {
-            return managedItems.RemoveAll(e => EqualityComparer<T>.Default.Equals(e.value, value));
+            return managedItems.Remove(item);
         }
 
         private IEnumerable<T> InternalRandomTake(int count)
@@ -71,20 +73,23 @@ namespace AillieoUtils.Collections
                 yield break;
             }
 
+            if (cachedWeightSum < 0)
+            {
+                cachedWeightSum = managedItems.Sum(item => item.Value);
+            }
+            float weightSum = cachedWeightSum;
+
             // deepcopy
-            List<Entry> deepcopy = new List<Entry>();
-            deepcopy.AddRange(managedItems);
+            List<KeyValuePair<T, float>> deepcopy = new List<KeyValuePair<T, float>>(managedItems);
 
             for (var i = 0; i < count; i++)
             {
-                // todo weightSum 做dirty标记
-                float weightSum = deepcopy.Sum(item => item.weight);
-                float ran = rand.Next() * weightSum;
+                float ran = (float)rand.NextDouble() * weightSum;
 
                 float sum = 0f;
                 for (var j = 0; j < deepcopy.Count; j++)
                 {
-                    sum += deepcopy[j].weight;
+                    sum += deepcopy[j].Value;
 
                     if (logWhileTaking)
                     {
@@ -93,7 +98,8 @@ namespace AillieoUtils.Collections
 
                     if (sum > ran)
                     {
-                        yield return deepcopy[j].value;
+                        yield return deepcopy[j].Key;
+                        weightSum -= deepcopy[j].Value;
 
                         // 移到最后一个
                         var last = deepcopy[deepcopy.Count - 1];
@@ -115,7 +121,7 @@ namespace AillieoUtils.Collections
 
             if (count == managedItems.Count)
             {
-                return managedItems.Select(e => e.value);
+                return managedItems.Select(e => e.Key);
             }
 
             return InternalRandomTake(count);
@@ -128,25 +134,54 @@ namespace AillieoUtils.Collections
                 throw new Exception("not enough items");
             }
 
-            float weightSum = managedItems.Sum(item => item.weight);
+            if (cachedWeightSum < 0)
+            {
+                cachedWeightSum = managedItems.Sum(item => item.Value);
+            }
+            float weightSum = cachedWeightSum;
             float ran = (float)rand.NextDouble() * weightSum;
             float sum = 0f;
-            for (var j = 0; j < managedItems.Count; j++)
+            foreach (var pair in managedItems)
             {
-                sum += managedItems[j].weight;
+                sum += pair.Value;
 
                 if (logWhileTaking)
                 {
-                    UnityEngine.Debug.Log($"index={j} sum={sum} ran={ran}");
+                    UnityEngine.Debug.Log($"index={0} sum={sum} ran={ran}");
                 }
 
                 if (sum > ran)
                 {
-                    return managedItems[j].value;
+                    return pair.Key;
                 }
             }
 
-            return default;
+            throw new IndexOutOfRangeException();
+        }
+
+        public void Add(T item)
+        {
+            Add(item, 1);
+        }
+
+        public bool Contains(T item)
+        {
+            return managedItems.ContainsKey(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return managedItems.Select(e => e.Key).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,34 +10,34 @@ namespace AillieoUtils.Collections
         private readonly Dictionary<TValue, HashSet<TKey>> lookup;
 
         public ReversibleDictionary()
+            : this(0, null, null)
         {
-            this.dictionary = new Dictionary<TKey, TValue>();
-            this.lookup = new Dictionary<TValue, HashSet<TKey>>();
         }
 
         public ReversibleDictionary(int capacity)
+            : this(capacity, null, null)
         {
-            throw new NotImplementedException();
         }
 
         public ReversibleDictionary(IEqualityComparer<TKey> comparer)
+            : this(0, comparer, null)
         {
-            throw new NotImplementedException();
         }
 
         public ReversibleDictionary(int capacity, IEqualityComparer<TKey> comparer)
+            : this(capacity, comparer, null)
         {
-            throw new NotImplementedException();
         }
 
         public ReversibleDictionary(IEqualityComparer<TKey> comparer, IEqualityComparer<TValue> valueComparer)
+            : this(0, comparer, valueComparer)
         {
-            throw new NotImplementedException();
         }
 
         public ReversibleDictionary(int capacity, IEqualityComparer<TKey> comparer, IEqualityComparer<TValue> valueComparer)
         {
-            throw new NotImplementedException();
+            this.dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+            this.lookup = new Dictionary<TValue, HashSet<TKey>>(capacity, valueComparer);
         }
 
         public bool HasKeyForValue(TValue value)

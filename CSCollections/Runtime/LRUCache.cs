@@ -11,9 +11,22 @@ namespace AillieoUtils.Collections
         private int capacity;
         private readonly LinkedDictionary<TKey, TValue> linkedDictionary;
 
-        public LRUCache() : this(defaultCapacity) { }
+        public LRUCache()
+            : this(defaultCapacity)
+        {
+        }
 
         public LRUCache(int capacity)
+            : this(capacity, null)
+        {
+        }
+
+        public LRUCache(IEqualityComparer<TKey> comparer)
+            : this(defaultCapacity, comparer)
+        {
+        }
+
+        public LRUCache(int capacity, IEqualityComparer<TKey> comparer)
         {
             if (capacity <= 0)
             {
@@ -21,17 +34,7 @@ namespace AillieoUtils.Collections
             }
 
             this.capacity = capacity;
-            linkedDictionary = new LinkedDictionary<TKey, TValue>(capacity);
-        }
-
-        public LRUCache(IEqualityComparer<TKey> comparer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public LRUCache(int capacity, IEqualityComparer<TKey> comparer)
-        {
-            throw new NotImplementedException();
+            linkedDictionary = new LinkedDictionary<TKey, TValue>(capacity, comparer);
         }
 
         public TValue this[TKey key]

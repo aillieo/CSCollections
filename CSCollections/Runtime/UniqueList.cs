@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AillieoUtils.Collections
 {
-    public class UniqueList<T> : IList<T>, IList, IReadOnlyCollection<T>, ICollection
+    public class UniqueList<T> : IList<T>, IList, IReadOnlyCollection<T>
     {
         private readonly HashSet<T> set;
         private readonly List<T> list;
@@ -64,7 +64,7 @@ namespace AillieoUtils.Collections
 
         public void CopyTo(Array array, int index)
         {
-            throw new NotImplementedException();
+            CopyTo(array as T[], index);
         }
 
         public void CopyTo(T[] array, int arrayIndex)

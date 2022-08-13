@@ -31,15 +31,32 @@ namespace AillieoUtils.Collections
 
         private int lowestFrequency;
 
-        public LFUCache() : this(defaultCapacity, defaultShrinkFactor)
+        public LFUCache()
+            : this(defaultCapacity, defaultShrinkFactor)
         {
         }
 
-        public LFUCache(int capacity) : this(capacity, defaultShrinkFactor)
+        public LFUCache(int capacity)
+            : this(capacity, defaultShrinkFactor)
         {
         }
 
         public LFUCache(int capacity, float shrinkFactor)
+            : this(capacity, null, shrinkFactor)
+        {
+        }
+
+        public LFUCache(IEqualityComparer<TKey> comparer)
+            : this(defaultCapacity, comparer, defaultShrinkFactor)
+        {
+        }
+
+        public LFUCache(int capacity, IEqualityComparer<TKey> comparer)
+            : this(capacity, comparer, defaultShrinkFactor)
+        {
+        }
+
+        public LFUCache(int capacity, IEqualityComparer<TKey> comparer, float shrinkFactor)
         {
             if (shrinkFactor <= 0 || shrinkFactor >= 1)
             {
@@ -57,21 +74,6 @@ namespace AillieoUtils.Collections
             maxFrequency = capacity - 1;
             this.capacity = capacity;
             this.shrinkFactor = shrinkFactor;
-        }
-
-        public LFUCache(IEqualityComparer<TKey> comparer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public LFUCache(int capacity, IEqualityComparer<TKey> comparer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public LFUCache(int capacity, IEqualityComparer<TKey> comparer, float shrinkFactor)
-        {
-            throw new NotImplementedException();
         }
 
         public void Add(TKey key, TValue value)

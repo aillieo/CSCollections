@@ -1,7 +1,8 @@
 {
     "name": "AillieoUtils.Collections.Editor",
+    "rootNamespace": "",
     "references": [
-        "GUID:a267d374a3f50354db3535d17079931d"
+        "AillieoUtils.Collections"
     ],
     "includePlatforms": [
         "Editor"

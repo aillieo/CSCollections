@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AillieoUtils.Collections
 {
-    public class PriorityQueue<T> : IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ICollection
+    public class PriorityQueue<T> : IReadOnlyCollection<T>, ICollection
     {
         private readonly IComparer<T> comparer;
         private T[] data;

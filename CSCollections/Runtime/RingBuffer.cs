@@ -1,12 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AillieoUtils.Collections
 {
     public class RingBuffer<T> : ICollection<T>, ICollection
     {
+        private List<T> buffer;
+        private int cursor;
+
+        public RingBuffer(int size)
+        {
+            buffer = new List<T>(size);
+        }
+
         public int Count => throw new NotImplementedException();
 
         bool ICollection<T>.IsReadOnly => false;
@@ -37,7 +44,7 @@ namespace AillieoUtils.Collections
 
         public void CopyTo(Array array, int index)
         {
-            throw new NotImplementedException();
+            CopyTo(array as T[], index);
         }
 
         public IEnumerator<T> GetEnumerator()
