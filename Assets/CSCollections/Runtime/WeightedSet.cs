@@ -58,11 +58,18 @@ namespace AillieoUtils.Collections
         public void Clear()
         {
             managedItems.Clear();
+            cachedWeightSum = -1f;
         }
 
         public bool Remove(T item)
         {
-            return managedItems.Remove(item);
+            if (managedItems.Remove(item))
+            {
+                cachedWeightSum = -1f;
+                return true;
+            }
+
+            return false;
         }
 
         private IEnumerable<T> InternalRandomTake(int count)
