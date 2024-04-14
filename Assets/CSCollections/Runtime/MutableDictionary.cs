@@ -1,10 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+// -----------------------------------------------------------------------
+// <copyright file="MutableDictionary.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class MutableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private readonly Dictionary<TKey, TValue> dictionary;
@@ -34,228 +40,105 @@ namespace AillieoUtils.Collections
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
-        public void Add(TKey key, TValue value)
-        {
-            if (iterationLock > 0)
-            {
-                if (removedKeys.Contains(key))
-                {
-                    throw new Exception("Add key while iterating");
-                }
-
-                removedKeys.Remove(key);
-                modifiedValues[key] = value;
-            }
-            else
-            {
-                dictionary.Add(key, value);
-            }
-        }
-
-        public void Add(KeyValuePair<TKey, TValue> item)
-        {
-            Add(item.Key, item.Value);
-        }
-
-        public void Clear()
-        {
-            if (iterationLock > 0)
-            {
-                dictionary.Select(p => removedKeys.Add(p.Key));
-                modifiedValues.Clear();
-            }
-            else
-            {
-                dictionary.Clear();
-                removedKeys.Clear();
-                modifiedValues.Clear();
-            }
-        }
-
-        public bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            if (iterationLock > 0)
-            {
-                if (removedKeys.Contains(item.Key))
-                {
-                    return false;
-                }
-
-                if (modifiedValues.Contains(item))
-                {
-                    return true;
-                }
-
-                return dictionary.Contains(item);
-            }
-            else
-            {
-                return dictionary.Contains(item);
-            }
-        }
-
-        public bool ContainsKey(TKey key)
-        {
-            if (iterationLock > 0)
-            {
-                return dictionary.ContainsKey(key) && !removedKeys.Contains(key);
-            }
-            else
-            {
-                return dictionary.ContainsKey(key);
-            }
-        }
-
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            if (iterationLock > 0)
-            {
-                if (removedKeys.Count > 0 || modifiedValues.Count > 0)
-                {
-                    throw new Exception("Copy while iterating");
-                }
-            }
-
-            ((ICollection<KeyValuePair<TKey, TValue>>) dictionary).CopyTo(array, arrayIndex);
-        }
-
+        /// <inheritdoc/>
         public int Count
         {
             get
             {
-                if (iterationLock > 0)
+                if (this.iterationLock > 0)
                 {
-                    return dictionary.Count - removedKeys.Count;
+                    return this.dictionary.Count - this.removedKeys.Count;
                 }
                 else
                 {
-                    return dictionary.Count;
+                    return this.dictionary.Count;
                 }
             }
         }
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        /// <inheritdoc/>
+        public ICollection<TKey> Keys
         {
-            return new Enumerator(this);
+            get
+            {
+                if (this.iterationLock > 0)
+                {
+                    return this.dictionary.Keys.Where(k => !this.removedKeys.Contains(k)).ToArray();
+                }
+                else
+                {
+                    return this.dictionary.Keys;
+                }
+            }
         }
 
-        public bool Remove(TKey key)
+        /// <inheritdoc/>
+        public ICollection<TValue> Values
         {
-            if (iterationLock > 0)
+            get
             {
-                if (dictionary.ContainsKey(key))
+                if (this.iterationLock > 0)
                 {
-                    removedKeys.Add(key);
-                    modifiedValues.Remove(key);
-                    return true;
+                    return this.dictionary
+                        .Where(p => !this.removedKeys.Contains(p.Key))
+                        .Select(p => this.modifiedValues.TryGetValue(p.Key, out TValue v) ? v : p.Value)
+                        .ToArray();
                 }
-
-                return false;
-            }
-            else
-            {
-                return dictionary.Remove(key);
+                else
+                {
+                    return this.dictionary.Values;
+                }
             }
         }
 
-        public bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            if (iterationLock > 0)
-            {
-                if (dictionary.ContainsKey(item.Key))
-                {
-                    if (((ICollection<KeyValuePair<TKey, TValue>>) modifiedValues).Remove(item))
-                    {
-                        removedKeys.Add(item.Key);
-                        return true;
-                    }
-
-                    if (dictionary.Contains(item) && !removedKeys.Contains(item.Key))
-                    {
-                        removedKeys.Add(item.Key);
-                        return true;
-                    }
-
-                    return false;
-                }
-
-                return false;
-            }
-            else
-            {
-                return ((ICollection<KeyValuePair<TKey, TValue>>) dictionary).Remove(item);
-            }
-        }
-
-        public bool TryGetValue(TKey key, out TValue value)
-        {
-            if (iterationLock > 0)
-            {
-                if (modifiedValues.TryGetValue(key, out value))
-                {
-                    return true;
-                }
-
-                if (removedKeys.Contains(key))
-                {
-                    value = default;
-                    return false;
-                }
-
-                return dictionary.TryGetValue(key, out value);
-            }
-            else
-            {
-                return dictionary.TryGetValue(key, out value);
-            }
-        }
-
+        /// <inheritdoc/>
         public TValue this[TKey key]
         {
             get
             {
-                if (iterationLock > 0)
+                if (this.iterationLock > 0)
                 {
-                    if (modifiedValues.TryGetValue(key, out TValue value))
+                    if (this.modifiedValues.TryGetValue(key, out TValue value))
                     {
                         return value;
                     }
 
-                    if (removedKeys.Contains(key))
+                    if (this.removedKeys.Contains(key))
                     {
                         throw new KeyNotFoundException();
                     }
 
-                    return dictionary[key];
+                    return this.dictionary[key];
                 }
                 else
                 {
-                    return dictionary[key];
+                    return this.dictionary[key];
                 }
             }
 
             set
             {
-                if (iterationLock > 0)
+                if (this.iterationLock > 0)
                 {
-                    if (modifiedValues.ContainsKey(key))
+                    if (this.modifiedValues.ContainsKey(key))
                     {
-                        modifiedValues[key] = value;
+                        this.modifiedValues[key] = value;
                         return;
                     }
 
-                    if (removedKeys.Contains(key))
+                    if (this.removedKeys.Contains(key))
                     {
-                        removedKeys.Remove(key);
-                        modifiedValues[key] = value;
+                        this.removedKeys.Remove(key);
+                        this.modifiedValues[key] = value;
                         return;
                     }
 
-                    if (dictionary.ContainsKey(key))
+                    if (this.dictionary.ContainsKey(key))
                     {
-                        modifiedValues[key] = value;
+                        this.modifiedValues[key] = value;
                     }
                     else
                     {
@@ -264,71 +147,212 @@ namespace AillieoUtils.Collections
                 }
                 else
                 {
-                    dictionary[key] = value;
-                }
-
-            }
-        }
-
-        public ICollection<TKey> Keys {
-            get
-            {
-                if (iterationLock > 0)
-                {
-                    return dictionary.Keys.Where(k => !removedKeys.Contains(k)).ToArray();
-                }
-                else
-                {
-                    return dictionary.Keys;
+                    this.dictionary[key] = value;
                 }
             }
         }
 
-        public ICollection<TValue> Values
+        /// <inheritdoc/>
+        public void Add(TKey key, TValue value)
         {
-            get
+            if (this.iterationLock > 0)
             {
-                if (iterationLock > 0)
+                if (this.removedKeys.Contains(key))
                 {
-                    return dictionary
-                        .Where(p => !removedKeys.Contains(p.Key))
-                        .Select(p => modifiedValues.TryGetValue(p.Key, out TValue v) ? v : p.Value)
-                        .ToArray();
+                    throw new Exception("Add key while iterating");
                 }
-                else
-                {
-                    return dictionary.Values;
-                }
+
+                this.removedKeys.Remove(key);
+                this.modifiedValues[key] = value;
+            }
+            else
+            {
+                this.dictionary.Add(key, value);
             }
         }
 
+        /// <inheritdoc/>
+        public void Add(KeyValuePair<TKey, TValue> item)
+        {
+            this.Add(item.Key, item.Value);
+        }
+
+        /// <inheritdoc/>
+        public void Clear()
+        {
+            if (this.iterationLock > 0)
+            {
+                this.dictionary.Select(p => this.removedKeys.Add(p.Key));
+                this.modifiedValues.Clear();
+            }
+            else
+            {
+                this.dictionary.Clear();
+                this.removedKeys.Clear();
+                this.modifiedValues.Clear();
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Contains(KeyValuePair<TKey, TValue> item)
+        {
+            if (this.iterationLock > 0)
+            {
+                if (this.removedKeys.Contains(item.Key))
+                {
+                    return false;
+                }
+
+                if (this.modifiedValues.Contains(item))
+                {
+                    return true;
+                }
+
+                return this.dictionary.Contains(item);
+            }
+            else
+            {
+                return this.dictionary.Contains(item);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool ContainsKey(TKey key)
+        {
+            if (this.iterationLock > 0)
+            {
+                return this.dictionary.ContainsKey(key) && !this.removedKeys.Contains(key);
+            }
+            else
+            {
+                return this.dictionary.ContainsKey(key);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
+            if (this.iterationLock > 0)
+            {
+                if (this.removedKeys.Count > 0 || this.modifiedValues.Count > 0)
+                {
+                    throw new Exception("Copy while iterating");
+                }
+            }
+
+            ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).CopyTo(array, arrayIndex);
+        }
+
+        /// <inheritdoc/>
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        /// <inheritdoc/>
+        public bool Remove(TKey key)
+        {
+            if (this.iterationLock > 0)
+            {
+                if (this.dictionary.ContainsKey(key))
+                {
+                    this.removedKeys.Add(key);
+                    this.modifiedValues.Remove(key);
+                    return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                return this.dictionary.Remove(key);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Remove(KeyValuePair<TKey, TValue> item)
+        {
+            if (this.iterationLock > 0)
+            {
+                if (this.dictionary.ContainsKey(item.Key))
+                {
+                    if (((ICollection<KeyValuePair<TKey, TValue>>)this.modifiedValues).Remove(item))
+                    {
+                        this.removedKeys.Add(item.Key);
+                        return true;
+                    }
+
+                    if (this.dictionary.Contains(item) && !this.removedKeys.Contains(item.Key))
+                    {
+                        this.removedKeys.Add(item.Key);
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return false;
+            }
+            else
+            {
+                return ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Remove(item);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            if (this.iterationLock > 0)
+            {
+                if (this.modifiedValues.TryGetValue(key, out value))
+                {
+                    return true;
+                }
+
+                if (this.removedKeys.Contains(key))
+                {
+                    value = default;
+                    return false;
+                }
+
+                return this.dictionary.TryGetValue(key, out value);
+            }
+            else
+            {
+                return this.dictionary.TryGetValue(key, out value);
+            }
+        }
+
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
         private void Rebuild()
         {
-            if (removedKeys.Count == 0 && modifiedValues.Count == 0)
+            if (this.removedKeys.Count == 0 && this.modifiedValues.Count == 0)
             {
                 return;
             }
 
-            foreach (var pair in modifiedValues)
+            foreach (var pair in this.modifiedValues)
             {
-                dictionary[pair.Key] = pair.Value;
+                this.dictionary[pair.Key] = pair.Value;
             }
-            modifiedValues.Clear();
 
-            foreach (var key in removedKeys)
+            this.modifiedValues.Clear();
+
+            foreach (var key in this.removedKeys)
             {
-                dictionary.Remove(key);
+                this.dictionary.Remove(key);
             }
-            removedKeys.Clear();
+
+            this.removedKeys.Clear();
         }
 
         [Serializable]
-        public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>//, IDictionaryEnumerator
+        public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
         {
             private MutableDictionary<TKey, TValue> mutable;
             private Dictionary<TKey, TValue>.Enumerator enumerator;
@@ -339,27 +363,41 @@ namespace AillieoUtils.Collections
                 this.mutable = mutable;
                 this.enumerator = mutable.dictionary.GetEnumerator();
                 mutable.iterationLock++;
+                this.current = default;
             }
 
+            /// <inheritdoc/>
+            public KeyValuePair<TKey, TValue> Current
+            {
+                get => this.current;
+            }
+
+            /// <inheritdoc/>
+            object IEnumerator.Current
+            {
+                get => this.Current;
+            }
+
+            /// <inheritdoc/>
             public bool MoveNext()
             {
-                if (enumerator.MoveNext())
+                if (this.enumerator.MoveNext())
                 {
-                    current = enumerator.Current;
+                    this.current = this.enumerator.Current;
                     while (true)
                     {
-                        if (mutable.removedKeys.Contains(current.Key))
+                        if (this.mutable.removedKeys.Contains(this.current.Key))
                         {
-                            enumerator.MoveNext();
-                            current = enumerator.Current;
+                            this.enumerator.MoveNext();
+                            this.current = this.enumerator.Current;
                             continue;
                         }
 
-                        if (mutable.modifiedValues.ContainsKey(current.Key))
+                        if (this.mutable.modifiedValues.ContainsKey(this.current.Key))
                         {
-                            current = new KeyValuePair<TKey, TValue>(
-                                current.Key,
-                                mutable.modifiedValues[current.Key]);
+                            this.current = new KeyValuePair<TKey, TValue>(
+                                this.current.Key,
+                                this.mutable.modifiedValues[this.current.Key]);
                         }
 
                         break;
@@ -369,31 +407,23 @@ namespace AillieoUtils.Collections
                 }
                 else
                 {
-                    current = default;
-                    mutable.iterationLock--;
-                    mutable.Rebuild();
+                    this.current = default;
+                    this.mutable.iterationLock--;
+                    this.mutable.Rebuild();
                     return false;
                 }
             }
 
-            public KeyValuePair<TKey, TValue> Current
-            {
-                get => current;
-            }
-
+            /// <inheritdoc/>
             public void Dispose()
             {
                 this.enumerator.Dispose();
             }
 
-            object IEnumerator.Current
-            {
-                get => Current;
-            }
-
+            /// <inheritdoc/>
             void IEnumerator.Reset()
             {
-                ((IEnumerator)enumerator).Reset();
+                ((IEnumerator)this.enumerator).Reset();
             }
         }
     }

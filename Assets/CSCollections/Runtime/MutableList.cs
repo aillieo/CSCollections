@@ -1,9 +1,15 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+// -----------------------------------------------------------------------
+// <copyright file="MutableList.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public class MutableList<T> : IList<T>
     {
         private readonly List<T> list;
@@ -18,74 +24,87 @@ namespace AillieoUtils.Collections
             this.modifiedValues = new Dictionary<int, T>();
         }
 
-        private void Rebuild()
-        {
-            if (removedIndexes.Count == 0 && modifiedValues.Count == 0)
-            {
-                return;
-            }
+        /// <inheritdoc/>
+        public int Count { get; }
 
-            throw new NotImplementedException();
+        /// <inheritdoc/>
+        bool ICollection<T>.IsReadOnly => false;
+
+        /// <inheritdoc/>
+        public T this[int index]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public void Add(T item)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void Clear()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public bool Contains(T item)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void CopyTo(T[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public bool Remove(T item)
         {
             throw new NotImplementedException();
         }
 
-        public int Count { get; }
-
-        bool ICollection<T>.IsReadOnly => false;
-
+        /// <inheritdoc/>
         public int IndexOf(T item)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void Insert(int index, T item)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void RemoveAt(int index)
         {
             throw new NotImplementedException();
         }
 
-        public T this[int index]
+        private void Rebuild()
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            if (this.removedIndexes.Count == 0 && this.modifiedValues.Count == 0)
+            {
+                return;
+            }
+
+            throw new NotImplementedException();
         }
 
         [Serializable]
@@ -103,20 +122,25 @@ namespace AillieoUtils.Collections
                 mutable.iterationLock++;
             }
 
+            /// <inheritdoc/>
+            public T Current => this.current;
+
+            /// <inheritdoc/>
+            object IEnumerator.Current => this.Current;
+
+            /// <inheritdoc/>
             public bool MoveNext()
             {
                 throw new NotImplementedException();
             }
 
+            /// <inheritdoc/>
             public void Reset()
             {
                 throw new NotImplementedException();
             }
 
-            public T Current => current;
-
-            object IEnumerator.Current => Current;
-
+            /// <inheritdoc/>
             public void Dispose()
             {
                 throw new NotImplementedException();

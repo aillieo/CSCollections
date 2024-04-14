@@ -1,9 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+// -----------------------------------------------------------------------
+// <copyright file="ReversibleDictionary.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class ReversibleDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private readonly Dictionary<TKey, TValue> dictionary;
@@ -40,9 +46,43 @@ namespace AillieoUtils.Collections
             this.lookup = new Dictionary<TValue, HashSet<TKey>>(capacity, valueComparer);
         }
 
+        /// <inheritdoc/>
+        public ICollection<TKey> Keys => this.dictionary.Keys;
+
+        /// <inheritdoc/>
+        public ICollection<TValue> Values => this.dictionary.Values;
+
+        /// <inheritdoc/>
+        public int Count => this.dictionary.Count;
+
+        /// <inheritdoc/>
+        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
+
+        /// <inheritdoc/>
+        public TValue this[TKey key]
+        {
+            get => this.dictionary[key];
+            set
+            {
+                if (this.dictionary.TryGetValue(key, out TValue v))
+                {
+                    // replace
+                    this.InternalRemoveKeyForValue(v, key);
+                    this.dictionary[key] = value;
+                    this.InternalAddKeyForValue(value, key);
+                }
+                else
+                {
+                    // add
+                    this.dictionary.Add(key, value);
+                    this.InternalAddKeyForValue(value, key);
+                }
+            }
+        }
+
         public bool HasKeyForValue(TValue value)
         {
-            if (lookup.TryGetValue(value, out HashSet<TKey> keys))
+            if (this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 return keys.Count > 0;
             }
@@ -52,7 +92,7 @@ namespace AillieoUtils.Collections
 
         public TKey FirstKeyForValue(TValue value)
         {
-            if (lookup.TryGetValue(value, out HashSet<TKey> keys))
+            if (this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 if (keys.Count > 0)
                 {
@@ -65,7 +105,7 @@ namespace AillieoUtils.Collections
 
         public TKey FirstKeyForValueOrDefault(TValue value, TKey defaultKey)
         {
-            if (lookup.TryGetValue(value, out HashSet<TKey> keys))
+            if (this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 if (keys.Count > 0)
                 {
@@ -78,7 +118,7 @@ namespace AillieoUtils.Collections
 
         public IEnumerable<TKey> KeysForValue(TValue value)
         {
-            if (lookup.TryGetValue(value, out HashSet<TKey> keys))
+            if (this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 if (keys.Count > 0)
                 {
@@ -91,16 +131,16 @@ namespace AillieoUtils.Collections
 
         public int RemoveKeysForValue(TValue value)
         {
-            int count = 0;
-            if (lookup.TryGetValue(value, out HashSet<TKey> keys))
+            var count = 0;
+            if (this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 foreach (var k in keys)
                 {
-                    dictionary.Remove(k);
+                    this.dictionary.Remove(k);
                     count++;
                 }
 
-                lookup.Remove(value);
+                this.lookup.Remove(value);
             }
 
             return count;
@@ -108,86 +148,65 @@ namespace AillieoUtils.Collections
 
         public void ClearLight()
         {
-            dictionary.Clear();
-            foreach (var pair in lookup)
+            this.dictionary.Clear();
+            foreach (var pair in this.lookup)
             {
                 pair.Value.Clear();
             }
         }
 
-        public TValue this[TKey key]
-        {
-            get => dictionary[key];
-            set
-            {
-                if (dictionary.TryGetValue(key, out TValue v))
-                {
-                    // replace
-                    InternalRemoveKeyForValue(v, key);
-                    dictionary[key] = value;
-                    InternalAddKeyForValue(value, key);
-                }
-                else
-                {
-                    // add
-                    dictionary.Add(key, value);
-                    InternalAddKeyForValue(value, key);
-                }
-            }
-        }
-
-        public ICollection<TKey> Keys => dictionary.Keys;
-
-        public ICollection<TValue> Values => dictionary.Values;
-
-        public int Count => dictionary.Count;
-
-        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
-
+        /// <inheritdoc/>
         public void Add(TKey key, TValue value)
         {
-            dictionary.Add(key, value);
-            InternalAddKeyForValue(value, key);
+            this.dictionary.Add(key, value);
+            this.InternalAddKeyForValue(value, key);
         }
 
+        /// <inheritdoc/>
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            dictionary.Add(item.Key, item.Value);
-            InternalAddKeyForValue(item.Value, item.Key);
+            this.dictionary.Add(item.Key, item.Value);
+            this.InternalAddKeyForValue(item.Value, item.Key);
         }
 
+        /// <inheritdoc/>
         public void Clear()
         {
-            dictionary.Clear();
-            lookup.Clear();
+            this.dictionary.Clear();
+            this.lookup.Clear();
         }
 
+        /// <inheritdoc/>
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Contains(item);
+            return ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Contains(item);
         }
 
+        /// <inheritdoc/>
         public bool ContainsKey(TKey key)
         {
-            return dictionary.ContainsKey(key);
+            return this.dictionary.ContainsKey(key);
         }
 
+        /// <inheritdoc/>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).CopyTo(array, arrayIndex);
+            ((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).CopyTo(array, arrayIndex);
         }
 
+        /// <inheritdoc/>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return dictionary.GetEnumerator();
+            return this.dictionary.GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public bool Remove(TKey key)
         {
-            if (dictionary.TryGetValue(key, out TValue value))
+            if (this.dictionary.TryGetValue(key, out TValue value))
             {
-                dictionary.Remove(key);
-                InternalRemoveKeyForValue(value, key);
+                this.dictionary.Remove(key);
+                this.InternalRemoveKeyForValue(value, key);
                 return true;
             }
             else
@@ -196,11 +215,12 @@ namespace AillieoUtils.Collections
             }
         }
 
+        /// <inheritdoc/>
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            if (((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Remove(item))
+            if (((ICollection<KeyValuePair<TKey, TValue>>)this.dictionary).Remove(item))
             {
-                InternalRemoveKeyForValue(item.Value, item.Key);
+                this.InternalRemoveKeyForValue(item.Value, item.Key);
                 return true;
             }
             else
@@ -209,22 +229,24 @@ namespace AillieoUtils.Collections
             }
         }
 
+        /// <inheritdoc/>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return dictionary.TryGetValue(key, out value);
+            return this.dictionary.TryGetValue(key, out value);
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
         private void InternalAddKeyForValue(TValue value, TKey key)
         {
-            if (!lookup.TryGetValue(value, out HashSet<TKey> keys))
+            if (!this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 keys = new HashSet<TKey>();
-                lookup.Add(value, keys);
+                this.lookup.Add(value, keys);
             }
 
             keys.Add(key);
@@ -232,7 +254,7 @@ namespace AillieoUtils.Collections
 
         private void InternalRemoveKeyForValue(TValue value, TKey key)
         {
-            if (!lookup.TryGetValue(value, out HashSet<TKey> keys))
+            if (!this.lookup.TryGetValue(value, out HashSet<TKey> keys))
             {
                 return;
             }

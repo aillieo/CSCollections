@@ -1,146 +1,140 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+// -----------------------------------------------------------------------
+// <copyright file="LimitedQueue.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class LimitedQueue<T> : IReadOnlyCollection<T>, ICollection
     {
-        public event Action<T> onPop;
+        private static readonly int defaultCapacity = 16;
 
         private readonly Queue<T> queue;
         private int size;
 
-        private static readonly int defaultCapacity = 16;
-
-        public LimitedQueue(int size) :
-            this(size, defaultCapacity)
+        public LimitedQueue(int size)
+            : this(size, defaultCapacity)
         {
         }
 
         public LimitedQueue(int size, int capacity)
         {
             this.size = size;
-            queue = new Queue<T>(capacity);
+            this.queue = new Queue<T>(capacity);
         }
 
         public int Size
         {
-            get { return size; }
+            get
+            {
+                return this.size;
+            }
+
             set
             {
-                if (size != value)
+                if (this.size != value)
                 {
-                    if (value < size)
+                    if (value < this.size)
                     {
-                        size = value;
-                        Trim();
+                        this.size = value;
+                        this.Trim();
                     }
                     else
                     {
-                        size = value;
+                        this.size = value;
                     }
                 }
             }
         }
 
-        private void Trim()
-        {
-            List<Exception> exceptions = null;
-            while (queue.Count > size)
-            {
-                T obj = queue.Dequeue();
-                try
-                {
-                    onPop?.Invoke(obj);
-                }
-                catch (Exception e)
-                {
-                    if (exceptions == null)
-                    {
-                        exceptions = new List<Exception>();
-                    }
-                    exceptions.Add(e);
-                }
-            }
+        /// <inheritdoc/>
+        public int Count => this.queue.Count;
 
-            if (exceptions != null)
-            {
-                throw new AggregateException(exceptions);
-            }
-        }
+        /// <inheritdoc/>
+        bool ICollection.IsSynchronized => false;
 
-        public int Count => queue.Count;
+        /// <inheritdoc/>
+        object ICollection.SyncRoot => this;
 
         public void Add(T item)
         {
-            if (queue.Count >= size)
+            if (this.queue.Count >= this.size)
             {
-                T obj = queue.Dequeue();
-                queue.Enqueue(item);
-
-                onPop?.Invoke(obj);
+                T obj = this.queue.Dequeue();
+                this.queue.Enqueue(item);
             }
             else
             {
-                queue.Enqueue(item);
+                this.queue.Enqueue(item);
             }
         }
 
         public bool TryAdd(T item)
         {
-            if (queue.Count >= size)
+            if (this.queue.Count >= this.size)
             {
                 return false;
             }
 
-            queue.Enqueue(item);
+            this.queue.Enqueue(item);
             return true;
         }
 
         public float Sum(Func<T, float> selector)
         {
-            return queue.Sum(selector);
+            return this.queue.Sum(selector);
         }
 
         public float Average(Func<T, float> selector)
         {
-            return queue.Average(selector);
+            return this.queue.Average(selector);
         }
-
-        bool ICollection.IsSynchronized => false;
-
-        object ICollection.SyncRoot => this;
 
         public void Clear()
         {
-            queue.Clear();
+            this.queue.Clear();
         }
 
         public bool Contains(T item)
         {
-            return queue.Contains(item);
+            return this.queue.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            queue.CopyTo(array, arrayIndex);
+            this.queue.CopyTo(array, arrayIndex);
         }
 
+        /// <inheritdoc/>
         public void CopyTo(Array array, int index)
         {
-            ((ICollection)queue).CopyTo(array, index);
+            ((ICollection)this.queue).CopyTo(array, index);
         }
 
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
-            return queue.GetEnumerator();
+            return this.queue.GetEnumerator();
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
+        }
+
+        private void Trim()
+        {
+            while (this.queue.Count > this.size)
+            {
+                this.queue.Dequeue();
+            }
         }
     }
 }

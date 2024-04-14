@@ -1,13 +1,24 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+// -----------------------------------------------------------------------
+// <copyright file="FIFOCache.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Represents a First-In-First-Out (FIFO) cache implementation using a linked dictionary.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the keys in the cache.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the cache.</typeparam>
     public class FIFOCache<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        private readonly LinkedDictionary<TKey, TValue> linkedDictionary;
         private static readonly int defaultCapacity = 255;
+        private readonly LinkedDictionary<TKey, TValue> linkedDictionary;
         private int capacity;
 
         public FIFOCache(int capacity)
@@ -31,92 +42,108 @@ namespace AillieoUtils.Collections
         {
         }
 
-        public ICollection<TKey> Keys => linkedDictionary.Keys;
+        /// <inheritdoc/>
+        public ICollection<TKey> Keys => this.linkedDictionary.Keys;
 
-        public ICollection<TValue> Values => linkedDictionary.Values;
+        /// <inheritdoc/>
+        public ICollection<TValue> Values => this.linkedDictionary.Values;
 
-        public int Count => linkedDictionary.Count;
+        /// <inheritdoc/>
+        public int Count => this.linkedDictionary.Count;
 
+        /// <inheritdoc/>
         bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
+        /// <inheritdoc/>
         public TValue this[TKey key]
         {
             get
             {
-                return linkedDictionary[key];
+                return this.linkedDictionary[key];
             }
 
             set
             {
-                if (linkedDictionary.Remove(key))
+                if (this.linkedDictionary.Remove(key))
                 {
-                    linkedDictionary.AddLast(key, value);
+                    this.linkedDictionary.AddLast(key, value);
                 }
                 else
                 {
-                    if (linkedDictionary.Count + 1 > capacity)
+                    if (this.linkedDictionary.Count + 1 > this.capacity)
                     {
-                        linkedDictionary.Remove(linkedDictionary.FirstKey);
+                        this.linkedDictionary.Remove(this.linkedDictionary.FirstKey);
                     }
 
-                    linkedDictionary.AddLast(key, value);
+                    this.linkedDictionary.AddLast(key, value);
                 }
             }
         }
 
+        /// <inheritdoc/>
         public void Add(TKey key, TValue value)
         {
-            linkedDictionary.AddLast(key, value);
+            this.linkedDictionary.AddLast(key, value);
         }
 
+        /// <inheritdoc/>
         public bool ContainsKey(TKey key)
         {
-            return linkedDictionary.ContainsKey(key);
+            return this.linkedDictionary.ContainsKey(key);
         }
 
+        /// <inheritdoc/>
         public bool Remove(TKey key)
         {
-            return linkedDictionary.Remove(key);
+            return this.linkedDictionary.Remove(key);
         }
 
+        /// <inheritdoc/>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return linkedDictionary.TryGetValue(key, out value);
+            return this.linkedDictionary.TryGetValue(key, out value);
         }
 
+        /// <inheritdoc/>
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            Add(item.Key, item.Value);
+            this.Add(item.Key, item.Value);
         }
 
+        /// <inheritdoc/>
         public void Clear()
         {
-            linkedDictionary.Clear();
+            this.linkedDictionary.Clear();
         }
 
+        /// <inheritdoc/>
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return ((ICollection<KeyValuePair<TKey, TValue>>)linkedDictionary).Contains(item);
+            return ((ICollection<KeyValuePair<TKey, TValue>>)this.linkedDictionary).Contains(item);
         }
 
+        /// <inheritdoc/>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            ((ICollection<KeyValuePair<TKey, TValue>>)this.linkedDictionary).CopyTo(array, arrayIndex);
         }
 
+        /// <inheritdoc/>
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            throw new NotImplementedException();
+            return ((ICollection<KeyValuePair<TKey, TValue>>)this.linkedDictionary).Remove(item);
         }
 
+        /// <inheritdoc/>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return linkedDictionary.GetEnumerator();
+            return this.linkedDictionary.GetEnumerator();
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
     }
 }

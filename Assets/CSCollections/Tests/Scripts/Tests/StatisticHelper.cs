@@ -1,9 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+// -----------------------------------------------------------------------
+// <copyright file="StatisticHelper.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class StatisticHelper
     {
         public readonly struct StatisticInfo
@@ -27,9 +33,9 @@ namespace AillieoUtils.Collections.Tests
 
             public override string ToString()
             {
-                int cnt = count;
-                string timesStr = string.Join("\n", times.OrderBy(pair => pair.Value).Select(pair => $"{pair.Key}: {pair.Value}({(float)pair.Value / cnt})"));
-                return $"count={count}\nmax={max}\nmin={min}\navg={average}\nvar={variance}\ntimes:\n{timesStr}";
+                int cnt = this.count;
+                string timesStr = string.Join("\n", this.times.OrderBy(pair => pair.Value).Select(pair => $"{pair.Key}: {pair.Value}({(float)pair.Value / cnt})"));
+                return $"count={this.count}\nmax={this.max}\nmin={this.min}\navg={this.average}\nvar={this.variance}\ntimes:\n{timesStr}";
             }
         }
 

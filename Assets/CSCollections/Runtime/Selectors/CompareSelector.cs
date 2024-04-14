@@ -1,9 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+// -----------------------------------------------------------------------
+// <copyright file="CompareSelector.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
-    public class CompareSelector<TSource, TTarget> : IComparer<TSource> where TTarget : IComparable<TTarget>
+    using System;
+    using System.Collections.Generic;
+
+    public class CompareSelector<TSource, TTarget> : IComparer<TSource>
+        where TTarget : IComparable<TTarget>
     {
         private readonly Func<TSource, TTarget> selector;
 
@@ -12,15 +19,16 @@ namespace AillieoUtils.Collections
             this.selector = selector;
         }
 
+        /// <inheritdoc/>
         public int Compare(TSource x, TSource y)
         {
-            TTarget tx = selector(x);
-            TTarget ty = selector(y);
+            TTarget tx = this.selector(x);
+            TTarget ty = this.selector(y);
             if (tx != null)
             {
                 return tx.CompareTo(ty);
             }
-            else if(ty != null)
+            else if (ty != null)
             {
                 return -ty.CompareTo(tx);
             }

@@ -1,9 +1,15 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+// -----------------------------------------------------------------------
+// <copyright file="MultiDictionary.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public class MultiDictionary<TKey, TValue> : IDictionary<TKey, ICollection<TValue>>
     {
         private readonly Dictionary<TKey, IList<TValue>> dict;
@@ -25,76 +31,92 @@ namespace AillieoUtils.Collections
 
         public MultiDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
-            dict = new Dictionary<TKey, IList<TValue>>(capacity, comparer);
+            this.dict = new Dictionary<TKey, IList<TValue>>(capacity, comparer);
         }
 
-        public IEnumerator<KeyValuePair<TKey, ICollection<TValue>>> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public void Add(KeyValuePair<TKey, ICollection<TValue>> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Contains(KeyValuePair<TKey, ICollection<TValue>> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(KeyValuePair<TKey, ICollection<TValue>>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Remove(KeyValuePair<TKey, ICollection<TValue>> item)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <inheritdoc/>
         public int Count { get; }
 
+        /// <inheritdoc/>
         bool ICollection<KeyValuePair<TKey, ICollection<TValue>>>.IsReadOnly => false;
 
-        public void Add(TKey key, ICollection<TValue> value)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc/>
+        public ICollection<TKey> Keys { get; }
 
-        public bool ContainsKey(TKey key)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc/>
+        public ICollection<ICollection<TValue>> Values { get; }
 
-        public bool Remove(TKey key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryGetValue(TKey key, out ICollection<TValue> value)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <inheritdoc/>
         public ICollection<TValue> this[TKey key]
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
 
-        public ICollection<TKey> Keys { get; }
+        /// <inheritdoc/>
+        public IEnumerator<KeyValuePair<TKey, ICollection<TValue>>> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICollection<ICollection<TValue>> Values { get; }
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        /// <inheritdoc/>
+        public void Add(KeyValuePair<TKey, ICollection<TValue>> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public bool Contains(KeyValuePair<TKey, ICollection<TValue>> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void CopyTo(KeyValuePair<TKey, ICollection<TValue>>[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public bool Remove(KeyValuePair<TKey, ICollection<TValue>> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void Add(TKey key, ICollection<TValue> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public bool ContainsKey(TKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public bool Remove(TKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public bool TryGetValue(TKey key, out ICollection<TValue> value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,10 +1,20 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+// -----------------------------------------------------------------------
+// <copyright file="Deque.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    /// <summary>
+    /// Represents a double-ended queue (deque) data structure.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the deque.</typeparam>
     public class Deque<T> : IReadOnlyCollection<T>, ICollection
     {
         private static readonly int defaultCapacity = 8;
@@ -15,7 +25,11 @@ namespace AillieoUtils.Collections
 
         private int offset;
 
-        public Deque() : this(defaultCapacity)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Deque{T}"/> class with the default capacity.
+        /// </summary>
+        public Deque()
+            : this(defaultCapacity)
         {
         }
 
@@ -23,109 +37,169 @@ namespace AillieoUtils.Collections
         {
             if (capacity < 0)
             {
-                throw new ArgumentException(nameof(capacity), "should >= 0");
+                throw new ArgumentException("should >= 0", nameof(capacity));
             }
 
-            buffer = capacity == 0 ? Array.Empty<T>() : new T[capacity];
+            this.buffer = capacity == 0 ? Array.Empty<T>() : new T[capacity];
+        }
+
+        /// <inheritdoc/>
+        public int Count { get; private set; }
+
+        public int Capacity
+        {
+            get
+            {
+                return this.buffer.Length;
+            }
+
+            private set
+            {
+                if (value == this.buffer.Length)
+                {
+                    return;
+                }
+
+                if (value < this.Count)
+                {
+                    throw new Exception($"capacity < count : {value},{this.Count}");
+                }
+
+                var newBuffer = new T[value];
+                this.CopyTo(newBuffer, 0);
+                this.offset = 0;
+                this.buffer = newBuffer;
+            }
+        }
+
+        /// <inheritdoc/>
+        bool ICollection.IsSynchronized => false;
+
+        /// <inheritdoc/>
+        object ICollection.SyncRoot => this;
+
+        private bool LoopsAround => this.Count > this.Capacity - this.offset;
+
+        private T Left
+        {
+            get { return this[0]; }
+            set { this[0] = value; }
+        }
+
+        private T Right
+        {
+            get { return this[this.Count - 1]; }
+            set { this[this.Count - 1] = value; }
+        }
+
+        public T this[int index]
+        {
+            get { return this.buffer[this.GetIndexInBuffer(index)]; }
+            set { this.buffer[this.GetIndexInBuffer(index)] = value; }
         }
 
         public void PushRight(T item)
         {
-            EnsureCapacity(Count + 1);
+            this.EnsureCapacity(this.Count + 1);
 
-            Count++;
-            Right = item;
+            this.Count++;
+            this.Right = item;
 
-            version++;
+            this.version++;
         }
 
         public void PushLeft(T item)
         {
-            EnsureCapacity(Count + 1);
+            this.EnsureCapacity(this.Count + 1);
 
-            offset = SafeGetIndex(offset - 1);
-            Count++;
-            Left = item;
+            this.offset = this.SafeGetIndex(this.offset - 1);
+            this.Count++;
+            this.Left = item;
 
-            version++;
+            this.version++;
         }
 
         public T PopRight()
         {
-            if (Count == 0)
+            if (this.Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
 
-            var right = Right;
-            Right = default;
-            Count--;
+            var right = this.Right;
+            this.Right = default;
+            this.Count--;
 
-            version++;
+            this.version++;
             return right;
         }
 
         public T PopLeft()
         {
-            if (Count == 0)
+            if (this.Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
 
-            var left = Left;
-            Left = default;
-            offset = SafeGetIndex(offset + 1);
-            Count--;
+            var left = this.Left;
+            this.Left = default;
+            this.offset = this.SafeGetIndex(this.offset + 1);
+            this.Count--;
 
-            version++;
+            this.version++;
             return left;
         }
 
         public T PeekRight()
         {
-            if (Count == 0)
+            if (this.Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
 
-            return Right;
+            return this.Right;
         }
 
         public T PeekLeft()
         {
-            if (Count == 0)
+            if (this.Count == 0)
             {
                 throw new InvalidOperationException("Attempt to get item from an empty deque");
             }
 
-            return Left;
+            return this.Left;
         }
 
         public void Clear()
         {
-            if (LoopsAround)
+            if (this.LoopsAround)
             {
-                Array.Clear(buffer, offset, Capacity - offset);
-                Array.Clear(buffer, 0, offset + (Count - Capacity));
+                Array.Clear(this.buffer, this.offset, this.Capacity - this.offset);
+                Array.Clear(this.buffer, 0, this.offset + (this.Count - this.Capacity));
             }
             else
             {
-                Array.Clear(buffer, offset, Count);
+                Array.Clear(this.buffer, this.offset, this.Count);
             }
 
-            Count = 0;
-            offset = 0;
-            version++;
+            this.Count = 0;
+            this.offset = 0;
+            this.version++;
         }
 
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < this.Count; i++)
+            {
+                yield return this[i];
+            }
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
         public bool Contains(T item)
@@ -145,47 +219,53 @@ namespace AillieoUtils.Collections
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex));
             }
 
-            if (Count == 0)
+            if (this.Count == 0)
             {
                 return;
             }
 
-            if (array.Length - arrayIndex < Count)
+            if (array.Length - arrayIndex < this.Count)
             {
-                throw new ArgumentException(nameof(array));
+                throw new ArgumentException("Length not enough", nameof(array));
             }
 
-            if (LoopsAround)
+            if (this.LoopsAround)
             {
-                Array.Copy(buffer, offset, array, arrayIndex, Capacity - offset);
-                Array.Copy(buffer, 0, array, arrayIndex + Capacity - offset, offset + (Count - Capacity));
+                Array.Copy(this.buffer, this.offset, array, arrayIndex, this.Capacity - this.offset);
+                Array.Copy(this.buffer, 0, array, arrayIndex + this.Capacity - this.offset, this.offset + (this.Count - this.Capacity));
             }
             else
             {
-                Array.Copy(buffer, offset, array, arrayIndex, Count);
+                Array.Copy(this.buffer, this.offset, array, arrayIndex, this.Count);
             }
         }
 
         public void TrimExcess()
         {
-            Capacity = Count;
+            this.Capacity = this.Count;
+        }
+
+        /// <inheritdoc/>
+        public void CopyTo(Array array, int index)
+        {
+            this.CopyTo(array as T[], index);
         }
 
         private void EnsureCapacity(int min)
         {
-            if (Capacity < min)
+            if (this.Capacity < min)
             {
-                var newCapacity = Capacity == 0 ? defaultCapacity : Capacity * 2;
+                var newCapacity = this.Capacity == 0 ? defaultCapacity : this.Capacity * 2;
                 newCapacity = Math.Max(newCapacity, min);
-                Capacity = newCapacity;
+                this.Capacity = newCapacity;
             }
         }
 
         private int SafeGetIndex(int position)
         {
-            if (Capacity != 0)
+            if (this.Capacity != 0)
             {
-                return (position + Capacity) % Capacity;
+                return (position + this.Capacity) % this.Capacity;
             }
 
             return 0;
@@ -193,68 +273,12 @@ namespace AillieoUtils.Collections
 
         private int GetIndexInBuffer(int index)
         {
-            if (index < 0 || index >= Capacity)
+            if (index < 0 || index >= this.Capacity)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
-            return SafeGetIndex(offset + index);
-        }
 
-        public void CopyTo(Array array, int index)
-        {
-            CopyTo(array as T[], index);
-        }
-
-        public int Count { get; private set; }
-
-        public int Capacity
-        {
-            get
-            {
-                return buffer.Length;
-            }
-
-            private set
-            {
-                if (value == buffer.Length)
-                {
-                    return;
-                }
-
-                if (value < Count)
-                {
-                    throw new Exception($"capacity < count : {value},{Count}");
-                }
-
-                T[] newBuffer = new T[value];
-                CopyTo(newBuffer, 0);
-                offset = 0;
-                buffer = newBuffer;
-            }
-        }
-
-        private bool LoopsAround => Count > Capacity - offset;
-
-        private T Left
-        {
-            get { return this[0]; }
-            set { this[0] = value; }
-        }
-
-        private T Right
-        {
-            get { return this[Count - 1]; }
-            set { this[Count - 1] = value; }
-        }
-
-        bool ICollection.IsSynchronized => false;
-
-        object ICollection.SyncRoot => this;
-
-        public T this[int index]
-        {
-            get { return buffer[GetIndexInBuffer(index)]; }
-            set { buffer[GetIndexInBuffer(index)] = value; }
+            return this.SafeGetIndex(this.offset + index);
         }
     }
 }

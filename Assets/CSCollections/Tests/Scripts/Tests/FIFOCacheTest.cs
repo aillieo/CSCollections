@@ -1,9 +1,13 @@
-using System;
-using System.Linq;
-using NUnit.Framework;
+// -----------------------------------------------------------------------
+// <copyright file="FIFOCacheTest.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections.Tests
 {
+    using NUnit.Framework;
+
     [Category(nameof(FIFOCacheTest))]
     public class FIFOCacheTest
     {

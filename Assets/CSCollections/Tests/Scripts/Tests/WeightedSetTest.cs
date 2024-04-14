@@ -1,9 +1,15 @@
-using System;
-using System.Linq;
-using NUnit.Framework;
+// -----------------------------------------------------------------------
+// <copyright file="WeightedSetTest.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections.Tests
 {
+    using System;
+    using System.Linq;
+    using NUnit.Framework;
+
     [Category(nameof(WeightedSetTest))]
     public class WeightedSetTest
     {
@@ -23,7 +29,7 @@ namespace AillieoUtils.Collections.Tests
         public static void TestAvg1()
         {
             WeightedSet<int> set = new WeightedSet<int>();
-            foreach(var i in Enumerable.Range(0, 10))
+            foreach (var i in Enumerable.Range(0, 10))
             {
                 set.Add(i, 1);
             }

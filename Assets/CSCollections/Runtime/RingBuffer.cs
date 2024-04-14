@@ -1,65 +1,54 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+// -----------------------------------------------------------------------
+// <copyright file="RingBuffer.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
-    public class RingBuffer<T> : ICollection<T>, ICollection
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
+    public class RingBuffer<T> : IEnumerable<T>
     {
-        private List<T> buffer;
+        private readonly T[] buffer;
         private int cursor;
 
         public RingBuffer(int size)
         {
-            buffer = new List<T>(size);
+            this.buffer = new T[size];
         }
 
-        public int Count => throw new NotImplementedException();
+        public T Current => this.buffer[this.cursor];
 
-        bool ICollection<T>.IsReadOnly => false;
-
-        bool ICollection.IsSynchronized => false;
-
-        object ICollection.SyncRoot => this;
-
+        /// <inheritdoc/>
         public void Add(T item)
         {
-            throw new NotImplementedException();
+            this.buffer[this.cursor] = item;
+            this.cursor = (this.cursor + 1) % this.buffer.Length;
         }
 
+        /// <inheritdoc/>
         public void Clear()
         {
-            throw new NotImplementedException();
+            Array.Clear(this.buffer, 0, this.buffer.Length);
+            this.cursor = 0;
         }
 
-        public bool Contains(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(Array array, int index)
-        {
-            CopyTo(array as T[], index);
-        }
-
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < this.buffer.Length; i++)
+            {
+                yield return this.buffer[i];
+            }
         }
 
-        public bool Remove(T item)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return this.GetEnumerator();
         }
     }
 }

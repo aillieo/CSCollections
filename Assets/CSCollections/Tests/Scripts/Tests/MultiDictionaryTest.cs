@@ -1,11 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+// -----------------------------------------------------------------------
+// <copyright file="MultiDictionaryTest.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections.Tests
 {
+    using NUnit.Framework;
+
     [Category(nameof(MultiDictionaryTest))]
     public class MultiDictionaryTest
     {

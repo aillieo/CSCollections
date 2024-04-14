@@ -1,29 +1,35 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+// -----------------------------------------------------------------------
+// <copyright file="PriorityQueue`1.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public class PriorityQueue<T> : IReadOnlyCollection<T>, ICollection
     {
+        private const int defaultCapacity = 16;
         private readonly IComparer<T> comparer;
         private T[] data;
-        private const int defaultCapacity = 16;
-
-        public int Count { get; private set; }
-
-        bool ICollection.IsSynchronized => false;
-
-        object ICollection.SyncRoot => this;
 
         public PriorityQueue()
-            : this(null) { }
+            : this(null)
+        {
+        }
 
         public PriorityQueue(int capacity)
-            : this(capacity, null) { }
+            : this(capacity, null)
+        {
+        }
 
         public PriorityQueue(IComparer<T> comparer)
-            : this(defaultCapacity, comparer) { }
+            : this(defaultCapacity, comparer)
+        {
+        }
 
         public PriorityQueue(int capacity, IComparer<T> comparer)
         {
@@ -31,94 +37,143 @@ namespace AillieoUtils.Collections
             this.data = new T[capacity];
         }
 
+        /// <inheritdoc/>
+        public int Count { get; private set; }
+
+        /// <inheritdoc/>
+        bool ICollection.IsSynchronized => false;
+
+        /// <inheritdoc/>
+        object ICollection.SyncRoot => this;
+
         public void Enqueue(T item)
         {
-            if (Count >= data.Length)
+            if (this.Count >= this.data.Length)
             {
-                Array.Resize(ref data, Count * 2);
+                Array.Resize(ref this.data, this.Count * 2);
             }
 
-            data[Count] = item;
-            SiftUp(Count++);
+            this.data[this.Count] = item;
+            this.SiftUp(this.Count++);
         }
 
         public T Dequeue()
         {
-            var v = Peek();
-            data[0] = data[--Count];
-            if (Count > 0)
+            var v = this.Peek();
+            this.data[0] = this.data[--this.Count];
+            if (this.Count > 0)
             {
-                SiftDown(0);
+                this.SiftDown(0);
             }
+
             return v;
         }
 
         public void Clear()
         {
-            Count = 0;
+            this.Count = 0;
         }
 
         public T Peek()
         {
-            if (Count > 0)
+            if (this.Count > 0)
             {
-                return data[0];
+                return this.data[0];
             }
 
             throw new Exception($"attempt to get Top from a empty {nameof(PriorityQueue<T>)}");
         }
 
-        private void SiftUp(int n)
+        /// <inheritdoc/>
+        public void CopyTo(Array array, int index)
         {
-            var v = data[n];
-            for (var n2 = n / 2;
-                n > 0 && comparer.Compare(v, data[n2]) > 0;
-                n = n2, n2 /= 2)
+            if (array == null)
             {
-                data[n] = data[n2];
+                throw new ArgumentNullException(nameof(array));
             }
 
-            data[n] = v;
+            if (index < 0 || index >= array.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            if (array.Length - index < this.Count)
+            {
+                throw new ArgumentException("The number of elements in the source collection is greater than the available space from index to the end of the destination array.");
+            }
+
+            if (array.Rank != 1)
+            {
+                throw new ArgumentException("The destination array must be a one-dimensional array.");
+            }
+
+            if (array is T[] tArray)
+            {
+                Array.Copy(this.data, 0, tArray, index, this.Count);
+            }
+            else
+            {
+                var targetType = array.GetType().GetElementType();
+                if (!typeof(T).IsAssignableFrom(targetType))
+                {
+                    throw new ArgumentException("The type of the source collection cannot be cast automatically to the type of the destination array.");
+                }
+
+                var destinationArray = Array.CreateInstance(targetType, this.Count);
+                Array.Copy(this.data, 0, destinationArray, 0, this.Count);
+                destinationArray.CopyTo(array, index);
+            }
+        }
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        /// <inheritdoc/>
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (var i = 0; i < this.Count; ++i)
+            {
+                yield return this.data[i];
+            }
+        }
+
+        private void SiftUp(int n)
+        {
+            var v = this.data[n];
+            for (var n2 = n / 2;
+                n > 0 && this.comparer.Compare(v, this.data[n2]) > 0;
+                n = n2, n2 /= 2)
+            {
+                this.data[n] = this.data[n2];
+            }
+
+            this.data[n] = v;
         }
 
         private void SiftDown(int n)
         {
-            var v = data[n];
+            var v = this.data[n];
             for (var n2 = n * 2;
-                n2 < Count;
+                n2 < this.Count;
                 n = n2, n2 *= 2)
             {
-                if (n2 + 1 < Count && comparer.Compare(data[n2 + 1], data[n2]) > 0)
+                if (n2 + 1 < this.Count && this.comparer.Compare(this.data[n2 + 1], this.data[n2]) > 0)
                 {
                     n2++;
                 }
 
-                if (comparer.Compare(v, data[n2]) >= 0)
+                if (this.comparer.Compare(v, this.data[n2]) >= 0)
                 {
                     break;
                 }
 
-                data[n] = data[n2];
+                this.data[n] = this.data[n2];
             }
-            data[n] = v;
-        }
 
-        public void CopyTo(Array array, int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            for (int i = 0; i < Count; ++i)
-            {
-                yield return data[i];
-            }
+            this.data[n] = v;
         }
     }
 }

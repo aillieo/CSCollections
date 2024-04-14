@@ -1,9 +1,14 @@
-using System;
-using System.Linq;
-using NUnit.Framework;
+// -----------------------------------------------------------------------
+// <copyright file="LFUCacheTest.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections.Tests
 {
+    using System.Linq;
+    using NUnit.Framework;
+
     [Category(nameof(LFUCacheTest))]
     public class LFUCacheTest
     {

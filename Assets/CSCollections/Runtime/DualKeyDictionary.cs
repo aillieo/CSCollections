@@ -1,10 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+// -----------------------------------------------------------------------
+// <copyright file="DualKeyDictionary.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AillieoUtils.Collections
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public struct KeyPack<TKey1, TKey2> : IEquatable<KeyPack<TKey1, TKey2>>
     {
         public readonly TKey1 key1;
@@ -16,6 +22,7 @@ namespace AillieoUtils.Collections
             this.key2 = key2;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is KeyPack<TKey1, TKey2> key)
@@ -26,42 +33,22 @@ namespace AillieoUtils.Collections
             return false;
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return key1.GetHashCode() * 397 ^ key2.GetHashCode();
+            return this.key1.GetHashCode() * 397 ^ this.key2.GetHashCode();
         }
 
+        /// <inheritdoc/>
         public bool Equals(KeyPack<TKey1, TKey2> other)
         {
-            return EqualityComparer<TKey1>.Default.Equals(key1, other.key1)
-                   && EqualityComparer<TKey2>.Default.Equals(key2, other.key2);
+            return EqualityComparer<TKey1>.Default.Equals(this.key1, other.key1)
+                   && EqualityComparer<TKey2>.Default.Equals(this.key2, other.key2);
         }
     }
 
     public class DualKeyDictionary<TKey1, TKey2, TValue> : IDictionary<KeyPack<TKey1, TKey2>, TValue>
     {
-        public class EqualityComparer : IEqualityComparer<KeyPack<TKey1, TKey2>>
-        {
-            private readonly IEqualityComparer<TKey1> equalityComparer1;
-            private readonly IEqualityComparer<TKey2> equalityComparer2;
-
-            public EqualityComparer(IEqualityComparer<TKey1> equalityComparer1, IEqualityComparer<TKey2> equalityComparer2)
-            {
-                this.equalityComparer1 = equalityComparer1;
-                this.equalityComparer2 = equalityComparer2;
-            }
-
-            public bool Equals(KeyPack<TKey1, TKey2> x, KeyPack<TKey1, TKey2> y)
-            {
-                return this.equalityComparer1.Equals(x.key1, y.key1) && this.equalityComparer2.Equals(x.key2, y.key2);
-            }
-
-            public int GetHashCode(KeyPack<TKey1, TKey2> obj)
-            {
-                return (equalityComparer1.GetHashCode(obj.key1) * 397) ^ equalityComparer2.GetHashCode(obj.key2);
-            }
-        }
-
         private readonly Dictionary<KeyPack<TKey1, TKey2>, TValue> dict;
 
         public DualKeyDictionary()
@@ -81,7 +68,7 @@ namespace AillieoUtils.Collections
 
         public DualKeyDictionary(int capacity, IEqualityComparer<KeyPack<TKey1, TKey2>> comparer)
         {
-            dict = new Dictionary<KeyPack<TKey1, TKey2>, TValue>(capacity, comparer);
+            this.dict = new Dictionary<KeyPack<TKey1, TKey2>, TValue>(capacity, comparer);
         }
 
         public DualKeyDictionary(IEqualityComparer<TKey1> key1Comparer, IEqualityComparer<TKey2> key2Comparer)
@@ -94,123 +81,163 @@ namespace AillieoUtils.Collections
         {
         }
 
+        /// <inheritdoc/>
+        public ICollection<KeyPack<TKey1, TKey2>> Keys => this.dict.Keys;
+
+        public ICollection<TKey1> AllKey1 => this.dict.Select(kvp => kvp.Key.key1).Distinct().ToArray();
+
+        public ICollection<TKey2> AllKey2 => this.dict.Select(kvp => kvp.Key.key2).Distinct().ToArray();
+
+        /// <inheritdoc/>
+        public ICollection<TValue> Values => this.dict.Values;
+
+        /// <inheritdoc/>
+        public int Count => this.dict.Count;
+
+        /// <inheritdoc/>
+        bool ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>.IsReadOnly => false;
+
+        /// <inheritdoc/>
         public TValue this[KeyPack<TKey1, TKey2> key]
         {
-            get => dict[key];
-            set => dict[key] = value;
+            get => this.dict[key];
+            set => this.dict[key] = value;
         }
 
         public TValue this[TKey1 key1, TKey2 key2]
         {
-            get => dict[new KeyPack<TKey1, TKey2>(key1, key2)];
-            set => dict[new KeyPack<TKey1, TKey2>(key1, key2)] = value;
+            get => this.dict[new KeyPack<TKey1, TKey2>(key1, key2)];
+            set => this.dict[new KeyPack<TKey1, TKey2>(key1, key2)] = value;
         }
 
-        public ICollection<KeyPack<TKey1, TKey2>> Keys => dict.Keys;
-
-        public ICollection<TKey1> AllKey1 => dict.Select(kvp => kvp.Key.key1).Distinct().ToArray();
-
-        public ICollection<TKey2> AllKey2 => dict.Select(kvp => kvp.Key.key2).Distinct().ToArray();
-
-        public ICollection<TValue> Values => dict.Values;
-
-        public int Count => dict.Count;
-
-        bool ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>.IsReadOnly => false;
-
+        /// <inheritdoc/>
         public void Add(KeyPack<TKey1, TKey2> key, TValue value)
         {
-            dict.Add(key, value);
+            this.dict.Add(key, value);
         }
 
+        /// <inheritdoc/>
         public void Add(KeyValuePair<KeyPack<TKey1, TKey2>, TValue> item)
         {
-            ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)dict).Add(item);
+            ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)this.dict).Add(item);
         }
 
         public void Add(TKey1 key1, TKey2 key2, TValue value)
         {
-            dict.Add(new KeyPack<TKey1, TKey2>(key1, key2), value);
+            this.dict.Add(new KeyPack<TKey1, TKey2>(key1, key2), value);
         }
 
+        /// <inheritdoc/>
         public void Clear()
         {
-            dict.Clear();
+            this.dict.Clear();
         }
 
+        /// <inheritdoc/>
         public bool Contains(KeyValuePair<KeyPack<TKey1, TKey2>, TValue> item)
         {
-            return ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)dict).Contains(item);
+            return ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)this.dict).Contains(item);
         }
 
+        /// <inheritdoc/>
         public bool ContainsKey(KeyPack<TKey1, TKey2> key)
         {
-            return dict.ContainsKey(key);
+            return this.dict.ContainsKey(key);
         }
 
         public bool ContainsKey(TKey1 key1, TKey2 key2)
         {
-            return dict.ContainsKey(new KeyPack<TKey1, TKey2>(key1, key2));
+            return this.dict.ContainsKey(new KeyPack<TKey1, TKey2>(key1, key2));
         }
 
         public bool ContainsKey1(TKey1 key1)
         {
-            return dict.Any(kvp => kvp.Key.key1.Equals(key1));
+            return this.dict.Any(kvp => kvp.Key.key1.Equals(key1));
         }
 
         public bool ContainsKey2(TKey2 key2)
         {
-            return dict.Any(kvp => kvp.Key.key2.Equals(key2));
+            return this.dict.Any(kvp => kvp.Key.key2.Equals(key2));
         }
 
+        /// <inheritdoc/>
         public void CopyTo(KeyValuePair<KeyPack<TKey1, TKey2>, TValue>[] array, int arrayIndex)
         {
-            ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)dict).CopyTo(array, arrayIndex);
+            ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)this.dict).CopyTo(array, arrayIndex);
         }
 
+        /// <inheritdoc/>
         public IEnumerator<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>> GetEnumerator()
         {
-            return dict.GetEnumerator();
+            return this.dict.GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public bool Remove(KeyPack<TKey1, TKey2> key)
         {
-            return dict.Remove(key);
+            return this.dict.Remove(key);
         }
 
         public bool Remove(TKey1 key1, TKey2 key2)
         {
-            return dict.Remove(new KeyPack<TKey1, TKey2>(key1, key2));
+            return this.dict.Remove(new KeyPack<TKey1, TKey2>(key1, key2));
         }
 
+        /// <inheritdoc/>
         public bool Remove(KeyValuePair<KeyPack<TKey1, TKey2>, TValue> item)
         {
-            return ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)dict).Remove(item);
+            return ((ICollection<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>>)this.dict).Remove(item);
         }
 
+        /// <inheritdoc/>
         public bool TryGetValue(KeyPack<TKey1, TKey2> key, out TValue value)
         {
-            return dict.TryGetValue(key, out value);
+            return this.dict.TryGetValue(key, out value);
         }
 
         public bool TryGetValue(TKey1 key1, TKey2 key2, out TValue value)
         {
-            return dict.TryGetValue(new KeyPack<TKey1, TKey2>(key1, key2), out value);
+            return this.dict.TryGetValue(new KeyPack<TKey1, TKey2>(key1, key2), out value);
         }
 
         public IEnumerable<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>> EnumKey1(TKey1 key1)
         {
-            return dict.Where(kvp => kvp.Key.key1.Equals(key1));
+            return this.dict.Where(kvp => kvp.Key.key1.Equals(key1));
         }
 
         public IEnumerable<KeyValuePair<KeyPack<TKey1, TKey2>, TValue>> EnumKey2(TKey2 key2)
         {
-            return dict.Where(kvp => kvp.Key.key2.Equals(key2));
+            return this.dict.Where(kvp => kvp.Key.key2.Equals(key2));
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
+        }
+
+        public class EqualityComparer : IEqualityComparer<KeyPack<TKey1, TKey2>>
+        {
+            private readonly IEqualityComparer<TKey1> equalityComparer1;
+            private readonly IEqualityComparer<TKey2> equalityComparer2;
+
+            public EqualityComparer(IEqualityComparer<TKey1> equalityComparer1, IEqualityComparer<TKey2> equalityComparer2)
+            {
+                this.equalityComparer1 = equalityComparer1;
+                this.equalityComparer2 = equalityComparer2;
+            }
+
+            /// <inheritdoc/>
+            public bool Equals(KeyPack<TKey1, TKey2> x, KeyPack<TKey1, TKey2> y)
+            {
+                return this.equalityComparer1.Equals(x.key1, y.key1) && this.equalityComparer2.Equals(x.key2, y.key2);
+            }
+
+            /// <inheritdoc/>
+            public int GetHashCode(KeyPack<TKey1, TKey2> obj)
+            {
+                return (this.equalityComparer1.GetHashCode(obj.key1) * 397) ^ this.equalityComparer2.GetHashCode(obj.key2);
+            }
         }
     }
 }
